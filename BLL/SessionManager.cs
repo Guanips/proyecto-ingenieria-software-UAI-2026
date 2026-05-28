@@ -4,25 +4,33 @@ namespace BLL
 {
     public class SessionManager
     {
-        static BE_Usuario user;
-        public static BE_Usuario User
+        // implementacion del singleton
+        private static SessionManager? Instance;
+        private SessionManager () { }
+        public static SessionManager getInstance
         {
             get
             {
-                return user;
+                if (Instance == null) Instance = new SessionManager();
+                return Instance;
             }
         }
-        public static bool Logged()
+
+        // logica especifica para nuestro caso
+        private Usuario? UsuarioActivo;
+        public Usuario? ObtenerUsuarioActivo()
         {
-            return user != null;
+            return UsuarioActivo;
         }
-        public static void Login(BE_Usuario usuario)
+
+        public void LogIn(Usuario usuario)
         {
-            user = usuario;
+            UsuarioActivo = usuario;
         }
-        public static void Logout()
+
+        public void LogOut()
         {
-            user = null;
+            UsuarioActivo = null;
         }
     }
 }
