@@ -17,7 +17,7 @@ namespace BLL
         {
             this.ListaRegistros = new List<Registro> ();
             this.RepoBitacora = new RepositorioBitacora ();
-            ListaRegistros = RepoBitacora.ListarRegistros();
+            //ListaRegistros = RepoBitacora.ListarRegistros();
         }
 
         public List<Registro> ConsultarBitacora ()

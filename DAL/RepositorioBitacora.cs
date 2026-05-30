@@ -6,7 +6,7 @@ namespace DAL
     {
         public RepositorioBitacora() { }
 
-        public List<Registro> ListarRegistros () { }
+        //public List<Registro> ListarRegistros () { }
 
         public void AlmacenarRegistro (Registro nRegistro) { }
     }

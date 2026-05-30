@@ -32,5 +32,9 @@ namespace BLL
         {
             UsuarioActivo = null;
         }
+        public bool Logged()
+        {
+            return UsuarioActivo != null;
+        }
     }
 }

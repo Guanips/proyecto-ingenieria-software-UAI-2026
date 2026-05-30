@@ -13,10 +13,14 @@ namespace servicios
                 StringBuilder sb = new StringBuilder();
                 foreach (byte b in passwordByte)
                 {
-                    sb.Append(b.ToString("X2"));
+                    sb.Append(b.ToString("X2")); // Retorna admin = 8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918
                 }
                 return sb.ToString();
             }
+        }
+        public static bool Comparer(string password, string passwordDB) 
+        {
+            return password == passwordDB;
         }
     }
 }

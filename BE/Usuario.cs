@@ -2,13 +2,18 @@
 {
     public class Usuario : Entidad
     {
-        private string Username {  get; set; }
-        private string Passwordhash { get; set; }
+        public string? Username { get; set; }
+        public string? Passwordhash { get; set; }
 
-        public Usuario(string nUsername, string nPasswordHash)
+        public Usuario() { }
+        public Usuario(object[] ob) : this((Guid)ob[0], (string)ob[1], (string)ob[2] ) { }
+
+        public Usuario(Guid id,string nUsername, string nPasswordHash) //Por ahora hardcodeamos el Usuario porque solo sera uno del tipo administrador
         {
+            Id = id;
             Username = nUsername;
             Passwordhash = nPasswordHash;
         }
     }
+
 }

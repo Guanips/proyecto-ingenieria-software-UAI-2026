@@ -1,0 +1,85 @@
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Data;
+using System.Data.Common;
+using System.Security.Cryptography.X509Certificates;
+using BE;
+
+namespace DAL
+{
+    public class DAO
+    {
+        SqlConnection cn;
+        DataSet ds;
+        DataTable dtUsers, dtBitacora;
+        SqlCommandBuilder cbUsers, cbBitacora;
+        SqlDataAdapter daUsers, daBitacora;
+        public DAO()
+        {
+            cn = new SqlConnection();//aun no decidi la base de datos o
+            ds = new DataSet("Users");
+            dtUsers = new DataTable("Usuarios");
+            dtBitacora = new DataTable("Bitacora");
+            daUsers = new SqlDataAdapter("Select * From Usuarios", cn);
+            daBitacora = new SqlDataAdapter("Select * From Bitacora", cn);
+            cbUsers = new SqlCommandBuilder(daUsers);
+            cbBitacora = new SqlCommandBuilder(daBitacora);
+
+            ds.Tables.Add(dtUsers);
+            ds.Tables.Add(dtBitacora);
+
+
+            cbUsers.GetInsertCommand().ExecuteNonQuery();
+
+
+            ////Para que no me este tirando error porque no hay DB
+            //dtUsers.PrimaryKey = new DataColumn[] { dtUsers.Columns[0] };
+            //dtBitacora.PrimaryKey = new DataColumn[] { dtBitacora.Columns[0] };
+            //CrearAdminInicial();
+        }
+        private void CrearAdminInicial()
+        {
+            string guidAdmin = Guid.NewGuid().ToString();//admin hardcodeado por primera y unica vez
+
+            SqlCommand cmd = new SqlCommand(
+                @"IF NOT EXISTS
+                  (
+                     SELECT 1
+                     FROM Usuarios
+                     WHERE Username = @Username
+                  )
+                  BEGIN
+                  INSERT INTO Usuarios
+                  (
+                     Id,
+                     Username,
+                     Password
+                  )
+                     VALUES
+                  (
+                     @Id,
+                     @Username,
+                     @Password
+                  )
+                END", cn);
+
+            cmd.Parameters.AddWithValue("@Id", guidAdmin);
+            cmd.Parameters.AddWithValue("@Username", "admin");
+            cmd.Parameters.AddWithValue("@Password", "admin");
+
+            cn.Open();
+            cmd.ExecuteNonQuery();
+            cn.Close();
+        }
+
+        public DataSet RetornaDataSet() => ds;
+
+        public DataTable RetornaDataTableUsuarios() => dtUsers;
+        public DataTable RetornaDataTableBitacora() => dtBitacora;
+
+    }
+}

@@ -1,5 +1,6 @@
 ﻿using BE;
 using DAL;
+using servicios;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace BLL
     {
         private List<IObserver> ObserversAttached = new List<IObserver>();
         private RepositorioUsuarios RepoUsuarios = new RepositorioUsuarios();
+        
 
         public GestorUsuarios () { }
 
@@ -32,11 +34,24 @@ namespace BLL
             foreach (IObserver item in ObserversAttached)
             {
                 item.Update(username, action)
-;            }
+;           }
         }
 
-        public void LogIn(string username, string password) { }
+        public void LogIn(string usuario, string pass)
+        {
 
-        public void LogOut() { }
+            if (!RepoUsuarios.VerificarUsuarioPorNombre(usuario)) throw new Exception("Usuario incorrecto");
+            Usuario _user = RepoUsuarios.ObtenerUsuarioPorNombre(usuario);
+            string hash = CryptoService.EncriptarPassword(pass);
+            if (!CryptoService.Comparer(hash, _user.Passwordhash)) throw new Exception("Contraseña incorrecta");
+            SessionManager.getInstance.LogIn(_user);
+
+
+        }
+
+        public void LogOut() 
+        {
+            SessionManager.getInstance.LogOut();
+        }
     }
 }
