@@ -31,13 +31,14 @@ namespace DAL
 
             ds.Tables.Add(dtUsers);
             ds.Tables.Add(dtBitacora);
+            CrearAdminInicial();
             daUsers.Fill(dtUsers);
             daBitacora.Fill(dtBitacora);
 
 
             //Para que no me este tirando error porque no hay DB
             dtUsers.PrimaryKey = new DataColumn[] { dtUsers.Columns[0] };
-            CrearAdminInicial();
+            
         }
         private void CrearAdminInicial()
         {
