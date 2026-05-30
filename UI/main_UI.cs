@@ -5,11 +5,16 @@ namespace UI
 {
     public partial class main_UI : Form
     {
+        private GestorUsuarios _gestorUsuarios = new GestorUsuarios();
+        private Bitacora _bitacora = new Bitacora();
         public main_UI()
         {
             InitializeComponent();
-            ValidarFormulario();
+            _gestorUsuarios.Attach(_bitacora);
             this.IsMdiContainer = true;
+            button1.Visible = false;
+            dataGridView1.Visible = false;
+            ValidarFormulario();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -19,21 +24,46 @@ namespace UI
 
         private void iniciarSesionToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            UI_iniciar_sesion Iniciar_Sesion = new UI_iniciar_sesion();
+            UI_iniciar_sesion Iniciar_Sesion = new UI_iniciar_sesion(_gestorUsuarios);
             Iniciar_Sesion.MdiParent = this;
             Iniciar_Sesion.Show();
         }
 
-        private void ValidarFormulario()
+        public void ValidarFormulario()
         {
             this.iniciarSesionToolStripMenuItem.Enabled = !SessionManager.getInstance.Logged();
             this.cerrarSesionToolStripMenuItem.Enabled = SessionManager.getInstance.Logged();
+            if (SessionManager.getInstance.Logged())
+            {
+                dataGridView1.DataSource = null;
+                button1.Visible = true;
+                dataGridView1.Visible = true;
+            }
+            else
+            {
+                button1.Visible = false;
+                dataGridView1.Visible = false;
+
+            }
         }
 
         private void cerrarSesionToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            foreach (Form hijo in this.MdiChildren)
+            {
+                hijo.Close();
+            }
+            _gestorUsuarios.LogOut();
             ValidarFormulario();
-            SessionManager.getInstance.LogOut();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Mostrar(dataGridView1,_bitacora.ConsultarBitacora());
+        }
+        private void Mostrar(DataGridView dgv, object o)
+        {
+            dgv.DataSource = null; dgv.DataSource = o;
         }
     }
 }

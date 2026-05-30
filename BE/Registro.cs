@@ -18,5 +18,6 @@ namespace BE
             this.Fecha = nFecha;
             this.Accion = nAccion;
         }
+        public Registro(object[] ob) : this((string)ob[0], (DateTime)ob[1], (string)ob[2]) { }
     }
 }

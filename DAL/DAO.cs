@@ -20,7 +20,7 @@ namespace DAL
         SqlDataAdapter daUsers, daBitacora;
         public DAO()
         {
-            cn = new SqlConnection();//aun no decidi la base de datos o
+            cn = new SqlConnection("Data Source=(local);Initial Catalog=Users;Integrated Security=True;Trust Server Certificate=True");//aun no decidi la base de datos o
             ds = new DataSet("Users");
             dtUsers = new DataTable("Usuarios");
             dtBitacora = new DataTable("Bitacora");
@@ -31,15 +31,13 @@ namespace DAL
 
             ds.Tables.Add(dtUsers);
             ds.Tables.Add(dtBitacora);
+            daUsers.Fill(dtUsers);
+            daBitacora.Fill(dtBitacora);
 
 
-            cbUsers.GetInsertCommand().ExecuteNonQuery();
-
-
-            ////Para que no me este tirando error porque no hay DB
-            //dtUsers.PrimaryKey = new DataColumn[] { dtUsers.Columns[0] };
-            //dtBitacora.PrimaryKey = new DataColumn[] { dtBitacora.Columns[0] };
-            //CrearAdminInicial();
+            //Para que no me este tirando error porque no hay DB
+            dtUsers.PrimaryKey = new DataColumn[] { dtUsers.Columns[0] };
+            CrearAdminInicial();
         }
         private void CrearAdminInicial()
         {
@@ -57,29 +55,30 @@ namespace DAL
                   (
                      Id,
                      Username,
-                     Password
+                     PasswordHash
                   )
                      VALUES
                   (
                      @Id,
                      @Username,
-                     @Password
+                     @PasswordHash
                   )
                 END", cn);
 
             cmd.Parameters.AddWithValue("@Id", guidAdmin);
             cmd.Parameters.AddWithValue("@Username", "admin");
-            cmd.Parameters.AddWithValue("@Password", "admin");
+            cmd.Parameters.AddWithValue("@PasswordHash", "8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918");//amin hasheado x2
 
             cn.Open();
             cmd.ExecuteNonQuery();
             cn.Close();
         }
 
-        public DataSet RetornaDataSet() => ds;
-
         public DataTable RetornaDataTableUsuarios() => dtUsers;
         public DataTable RetornaDataTableBitacora() => dtBitacora;
 
+        public void ActualizarBitacora (DataTable dtBitacora) => daBitacora.Update(dtBitacora);
+        
+        //public void ActualizarUsuarios (DataTable dtUsuarios) => daUsers.Update(dtUsuarios);
     }
 }

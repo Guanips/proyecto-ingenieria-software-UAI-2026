@@ -3,7 +3,7 @@
     public class Usuario : Entidad
     {
         public string? Username { get; set; }
-        public string? Passwordhash { get; set; }
+        public string? PasswordHash { get; set; }
 
         public Usuario() { }
         public Usuario(object[] ob) : this((Guid)ob[0], (string)ob[1], (string)ob[2] ) { }
@@ -12,7 +12,7 @@
         {
             Id = id;
             Username = nUsername;
-            Passwordhash = nPasswordHash;
+            PasswordHash = nPasswordHash;
         }
     }
 

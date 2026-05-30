@@ -28,7 +28,7 @@ namespace DAL
             }
             return list_user;
         }
-
+        
         public bool VerificarUsuarioPorNombre(string username)
         {
             return ObtenerListaUsuario().Exists(x => x.Username == username);

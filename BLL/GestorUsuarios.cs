@@ -14,6 +14,7 @@ namespace BLL
         private List<IObserver> ObserversAttached = new List<IObserver>();
         private RepositorioUsuarios RepoUsuarios = new RepositorioUsuarios();
         
+        
 
         public GestorUsuarios () { }
 
@@ -22,13 +23,13 @@ namespace BLL
             ObserversAttached.Add(observer);
         }
 
-        public void Detach(IObserver observer)
-        {
-            IObserver? foundObserver = ObserversAttached.Find((item) => item == observer);
-            if (foundObserver == null) throw new Exception("Observer no agregado");
-            ObserversAttached.Remove(observer);
-        }
-
+        //public void Detach(IObserver observer)
+        //{
+        //    IObserver? foundObserver = ObserversAttached.Find((item) => item == observer);
+        //    if (foundObserver == null) throw new Exception("Observer no agregado");
+        //    ObserversAttached.Remove(observer);
+        //}
+        
         public void Notificar(string username, string action)
         {
             foreach (IObserver item in ObserversAttached)
@@ -43,14 +44,15 @@ namespace BLL
             if (!RepoUsuarios.VerificarUsuarioPorNombre(usuario)) throw new Exception("Usuario incorrecto");
             Usuario _user = RepoUsuarios.ObtenerUsuarioPorNombre(usuario);
             string hash = CryptoService.EncriptarPassword(pass);
-            if (!CryptoService.Comparer(hash, _user.Passwordhash)) throw new Exception("Contraseña incorrecta");
+            if (!CryptoService.Comparer(hash, _user.PasswordHash)) throw new Exception("Contraseña incorrecta");
             SessionManager.getInstance.LogIn(_user);
-
+            Notificar(usuario, "Inicio De Sesion");
 
         }
 
         public void LogOut() 
         {
+            Notificar(SessionManager.getInstance.ObtenerUsuarioActivo().Username.ToString(),"Cierre de Sesion");
             SessionManager.getInstance.LogOut();
         }
     }
