@@ -24,7 +24,8 @@ namespace DAL
             DataTable table = dao.RetornaDataTableUsuarios();
             foreach (DataRow dr in table.Rows)
             {
-                list_user.Add(new Usuario(dr.ItemArray));
+                Guid parsedId = Guid.Parse(dr[0].ToString());
+                list_user.Add(new Usuario(parsedId, (string)dr[1], (string)dr[2]));
             }
             return list_user;
         }
@@ -40,7 +41,5 @@ namespace DAL
             Usuario _user = ObtenerListaUsuario().Find(x => x.Username == username);
             return _user;
         }
-
-
     }
 }

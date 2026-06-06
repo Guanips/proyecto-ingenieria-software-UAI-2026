@@ -18,61 +18,28 @@ namespace DAL
         DataTable dtUsers, dtBitacora;
         SqlCommandBuilder cbUsers, cbBitacora;
         SqlDataAdapter daUsers, daBitacora;
+        DataRelation drUsuarioBitacora;
+
         public DAO()
         {
-            cn = new SqlConnection("Data Source=(local);Initial Catalog=Users;Integrated Security=True;Trust Server Certificate=True");//aun no decidi la base de datos o
+            cn = new SqlConnection("Data Source=.;Initial Catalog=db_demostracion_ing_soft_cg;Integrated Security=True;Encrypt=True;Trust Server Certificate=True");//aun no decidi la base de datos o
             ds = new DataSet("Users");
-            dtUsers = new DataTable("Usuarios");
+            dtUsers = new DataTable("Usuario");
             dtBitacora = new DataTable("Bitacora");
-            daUsers = new SqlDataAdapter("Select * From Usuarios", cn);
+            daUsers = new SqlDataAdapter("Select * From Usuario", cn);
             daBitacora = new SqlDataAdapter("Select * From Bitacora", cn);
             cbUsers = new SqlCommandBuilder(daUsers);
             cbBitacora = new SqlCommandBuilder(daBitacora);
 
             ds.Tables.Add(dtUsers);
             ds.Tables.Add(dtBitacora);
-            CrearAdminInicial();
             daUsers.Fill(dtUsers);
             daBitacora.Fill(dtBitacora);
 
-
-            //Para que no me este tirando error porque no hay DB
             dtUsers.PrimaryKey = new DataColumn[] { dtUsers.Columns[0] };
-            
-        }
-        private void CrearAdminInicial()
-        {
-            string guidAdmin = Guid.NewGuid().ToString();//admin hardcodeado por primera y unica vez
-
-            SqlCommand cmd = new SqlCommand(
-                @"IF NOT EXISTS
-                  (
-                     SELECT 1
-                     FROM Usuarios
-                     WHERE Username = @Username
-                  )
-                  BEGIN
-                  INSERT INTO Usuarios
-                  (
-                     Id,
-                     Username,
-                     PasswordHash
-                  )
-                     VALUES
-                  (
-                     @Id,
-                     @Username,
-                     @PasswordHash
-                  )
-                END", cn);
-
-            cmd.Parameters.AddWithValue("@Id", guidAdmin);
-            cmd.Parameters.AddWithValue("@Username", "admin");
-            cmd.Parameters.AddWithValue("@PasswordHash", "8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918");//amin hasheado x2
-
-            cn.Open();
-            cmd.ExecuteNonQuery();
-            cn.Close();
+            dtBitacora.PrimaryKey = new DataColumn[] {dtBitacora.Columns[0] };
+            drUsuarioBitacora = new DataRelation("FK_Bitacora_Usuario", dtUsers.Columns[0], dtBitacora.Columns[1]);
+            ds.Relations.Add(drUsuarioBitacora);
         }
 
         public DataTable RetornaDataTableUsuarios() => dtUsers;

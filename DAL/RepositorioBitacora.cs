@@ -17,7 +17,8 @@ namespace DAL
             List<Registro> _listRegistro = new List<Registro>();
             foreach (DataRow dr in dao.RetornaDataTableBitacora().Rows)
             {
-                _listRegistro.Add(new Registro(dr.ItemArray));
+                DataRow usuarioRelacionado = dr.GetParentRow("FK_Bitacora_Usuario");
+                _listRegistro.Add(new Registro((string)usuarioRelacionado[1], (DateTime)dr[2], (string)dr[3]));
             }
             return _listRegistro;
         }
