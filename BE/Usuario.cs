@@ -2,10 +2,8 @@
 {
     public class Usuario : Entidad
     {
-        public string? Username { get; set; }
-        public string? PasswordHash { get; set; }
-
-        public Usuario() { }
+        public string Username { get; set; }
+        public string PasswordHash { get; set; }
 
         public Usuario(Guid id,string nUsername, string nPasswordHash)
         {
