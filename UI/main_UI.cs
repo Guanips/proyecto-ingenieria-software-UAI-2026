@@ -6,7 +6,7 @@ namespace UI
     public partial class main_UI : Form
     {
         private GestorUsuarios _gestorUsuarios = new GestorUsuarios();
-        private Bitacora _bitacora = new Bitacora();
+        private GestorBitacora _bitacora = new GestorBitacora();
         public main_UI()
         {
             InitializeComponent();
