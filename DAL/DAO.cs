@@ -46,8 +46,16 @@ namespace DAL
                 // config de PK
                 DataColumn columnaIdRegistro = dtBitacora.Columns[0];
                 dtBitacora.PrimaryKey = [columnaIdRegistro];
+                int maxId = 0;
+
+                if (dtBitacora.Rows.Count > 0)
+                {
+                    maxId = dtBitacora.AsEnumerable()
+                                      .Max(r => r.Field<int>("ID"));
+                }
+
                 columnaIdRegistro.AutoIncrement = true;
-                columnaIdRegistro.AutoIncrementSeed = 0;
+                columnaIdRegistro.AutoIncrementSeed = maxId + 1;
                 columnaIdRegistro.AutoIncrementStep = 1;
 
                 dtUsers.PrimaryKey = [dtUsers.Columns[0]];
