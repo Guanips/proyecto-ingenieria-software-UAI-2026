@@ -8,11 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace UI.Login
+namespace UI.Modules
 {
-    public partial class UI_registro : Form
+    public partial class BloqueoUsuariosUI : Form
     {
-        public UI_registro()
+        public BloqueoUsuariosUI()
         {
             InitializeComponent();
         }
