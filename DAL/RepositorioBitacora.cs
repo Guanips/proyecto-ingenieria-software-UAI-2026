@@ -5,17 +5,19 @@ namespace DAL
 {
     public class RepositorioBitacora
     {
-        DAO dao;
-        public RepositorioBitacora() 
-        {
-            dao = new DAO();
-        }
+        public RepositorioBitacora() { }
 
-        public List<Registro> ListarRegistros () => MappearRegistros();
+        public List<Registro> ListarRegistros() => MappearRegistros();
         private List<Registro> MappearRegistros()
         {
+            DAO dao = DAO.GetInstance;
+            DataSet ds = dao.ObtenerDataSet();
+            DataTable tablaBitacora = ds.Tables["Bitacora"];
+
+            if (tablaBitacora == null) throw new Exception("Tabla de bitacora no encontrada en el DataSet");
+
             List<Registro> _listRegistro = new List<Registro>();
-            foreach (DataRow dr in dao.RetornaDataTableBitacora().Rows)
+            foreach (DataRow dr in tablaBitacora.Rows)
             {
                 DataRow? usuarioRelacionado = dr.GetParentRow("FK_Bitacora_Usuario");
                 if (usuarioRelacionado == null) throw new Exception("Usuario relacionado a registro de bitacora no encontrado");
@@ -23,15 +25,20 @@ namespace DAL
             }
             return _listRegistro;
         }
-        public void AlmacenarRegistro (Registro nRegistro, string idUsuarioInvolucrado) 
+        public void AlmacenarRegistro(Registro nRegistro, string idUsuarioInvolucrado)
         {
-            DataTable tablaBitacora = dao.RetornaDataTableBitacora();
+            DAO dao = DAO.GetInstance;
+            DataSet ds = dao.ObtenerDataSet();
+            DataTable tablaBitacora = ds.Tables["Bitacora"];
+
+            if (tablaBitacora == null) throw new Exception("Tabla de bitacora no encontrada en el DataSet");
+
             DataRow nFilaRegistro = tablaBitacora.NewRow();
             nFilaRegistro[1] = idUsuarioInvolucrado;
             nFilaRegistro[2] = nRegistro.Fecha;
             nFilaRegistro[3] = nRegistro.Accion;
             tablaBitacora.Rows.Add(nFilaRegistro);
-            dao.ActualizarBitacora(tablaBitacora);
+            dao.SubirCambiosBD();
         }
     }
 }

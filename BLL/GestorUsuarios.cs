@@ -1,20 +1,14 @@
 ﻿using BE;
 using DAL;
 using servicios;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BLL
 {
     public class GestorUsuarios : ISujeto
     {
         private List<IObserver> ObserversAttached = new List<IObserver>();
-        private RepositorioUsuarios RepoUsuarios = new RepositorioUsuarios();
 
-        public GestorUsuarios () { }
+        public GestorUsuarios() { }
 
         public void Attach(IObserver observer)
         {
@@ -33,26 +27,37 @@ namespace BLL
             foreach (IObserver item in ObserversAttached)
             {
                 item.Update(usuarioInvolucrado, action)
-;           }
+;
+            }
         }
 
-        public void LogIn(string usuario, string pass)
+        public List<Usuario> ListarUsuarios()
         {
-            if (!RepoUsuarios.VerificarUsuarioPorNombre(usuario)) throw new Exception("Usuario incorrecto");
-            Usuario _user = RepoUsuarios.ObtenerUsuarioPorNombre(usuario);
-            string hash = CryptoService.EncriptarPassword(pass);
-            if (!CryptoService.Comparer(hash, _user.PasswordHash)) throw new Exception("Contraseña incorrecta");
-            SessionManager.getInstance.LogIn(_user);
-            Notificar(_user, "Inicio De Sesion");
+            RepositorioUsuarios repositorioUsuarios = RepositorioUsuarios.GetInstance;
+            return repositorioUsuarios.ObtenerListadoTotalUsuarios();
         }
 
-        public void LogOut() 
+        public void RegistrarUsuario(string nUsername, string nPassword, string nEmail, string nNumTelefono)
         {
-            Usuario? usuarioActivo = SessionManager.getInstance.ObtenerUsuarioActivo();
-            if (usuarioActivo == null) throw new Exception("Usuario activo no encontrado en logout");
+            bool usuarioExiste = RepositorioUsuarios.GetInstance.VerificarExistenciaDeUsername(nUsername);
+            if (usuarioExiste) throw new Exception("El usuario ya existe");
 
-            Notificar(usuarioActivo,"Cierre de Sesion");
-            SessionManager.getInstance.LogOut();
+            string passwordHash = CryptoService.EncriptarPassword(nPassword);
+
+            Usuario nuevoUsuario = new Usuario(Guid.NewGuid(), nUsername, passwordHash, nEmail, nNumTelefono, false);
+            RepositorioUsuarios.GetInstance.AgregarUsuario(nuevoUsuario);
+        }
+
+        public void EliminarUsuario(string nUsername)
+        {
+            RepositorioUsuarios.GetInstance.EliminarUsuario(nUsername);
+        }
+
+        public void ModificarUsuario(string nUsername, string nEmail, string nNumTelefono)
+        {
+            Usuario usuarioObtenido = RepositorioUsuarios.GetInstance.ObtenerUsuario(nUsername);
+            Usuario usuarioModificado = new Usuario(usuarioObtenido.Id, nUsername, usuarioObtenido.PasswordHash, nEmail, nNumTelefono, usuarioObtenido.EstaBloqueado);
+            RepositorioUsuarios.GetInstance.ModificarUsuario(usuarioModificado);
         }
     }
 }

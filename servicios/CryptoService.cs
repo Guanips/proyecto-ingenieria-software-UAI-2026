@@ -5,7 +5,7 @@ namespace servicios
 {
     public class CryptoService
     {
-        public static string EncriptarPassword (string password)
+        public static string EncriptarPassword(string password)
         {
             using (SHA256 sha256 = SHA256.Create())
             {
@@ -18,7 +18,7 @@ namespace servicios
                 return sb.ToString();
             }
         }
-        public static bool Comparer(string password, string passwordDB) 
+        public static bool Comparer(string password, string passwordDB)
         {
             return password == passwordDB;
         }

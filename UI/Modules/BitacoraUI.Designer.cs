@@ -1,6 +1,6 @@
-﻿namespace UI.Login
+﻿namespace UI.Modules
 {
-    partial class UI_registro
+    partial class BitacoraUI
     {
         /// <summary>
         /// Required designer variable.
@@ -31,7 +31,7 @@
             this.components = new System.ComponentModel.Container();
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "UI_registro";
+            this.Text = "BitacoraUI";
         }
 
         #endregion
