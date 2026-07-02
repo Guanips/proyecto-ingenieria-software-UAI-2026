@@ -49,7 +49,7 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { mainUIStripMenuItemInicio, mainUIStripMenuItemGestionDeUsuarios, mainUIStripMenuItemGestionDePerfiles, mainUIStripMenuItemBitacora, mainUIStripMenuItemPerfiles });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(1025, 24);
+            menuStrip1.Size = new Size(1108, 24);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -119,7 +119,7 @@
             // mainUIStripMenuItemConsultarBitacora
             // 
             mainUIStripMenuItemConsultarBitacora.Name = "mainUIStripMenuItemConsultarBitacora";
-            mainUIStripMenuItemConsultarBitacora.Size = new Size(180, 22);
+            mainUIStripMenuItemConsultarBitacora.Size = new Size(171, 22);
             mainUIStripMenuItemConsultarBitacora.Text = "Consultar bitacora";
             mainUIStripMenuItemConsultarBitacora.Click += mainUIStripMenuItemConsultarBitacora_Click;
             // 
@@ -133,14 +133,14 @@
             // mainUIStripMenuItemGestionarPerfiles
             // 
             mainUIStripMenuItemGestionarPerfiles.Name = "mainUIStripMenuItemGestionarPerfiles";
-            mainUIStripMenuItemGestionarPerfiles.Size = new Size(180, 22);
+            mainUIStripMenuItemGestionarPerfiles.Size = new Size(165, 22);
             mainUIStripMenuItemGestionarPerfiles.Text = "Gestionar perfiles";
             // 
             // MainUI
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1025, 564);
+            ClientSize = new Size(1108, 564);
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;
             Name = "MainUI";
