@@ -9,9 +9,8 @@ namespace DAL
         private static readonly object _lock = new object();
 
         private DataSet mainDataSet;
-        private SqlCommandBuilder cbUsers, cbBitacora;
-        private SqlDataAdapter daUsers, daBitacora;
-        private DataRelation drUsuarioBitacora;
+        private SqlCommandBuilder cbUsers, cbBitacora, cbPermiso, cbPermisoRelacion;
+        private SqlDataAdapter daUsers, daBitacora, daPermiso, daPermisoRelacion;
 
         private DAO()
         {
@@ -19,42 +18,107 @@ namespace DAL
 
             daUsers = new SqlDataAdapter("Select * From Usuario", connectionString);
             daBitacora = new SqlDataAdapter("Select * From Bitacora", connectionString);
+            daPermiso = new SqlDataAdapter("Select * From Permiso", connectionString);
+            daPermisoRelacion = new SqlDataAdapter("Select * From PermisoRelacion", connectionString);
+
+            daUsers.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+            daBitacora.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+            daPermiso.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+            daPermisoRelacion.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
             cbUsers = new SqlCommandBuilder(daUsers);
             cbBitacora = new SqlCommandBuilder(daBitacora);
+            cbPermiso = new SqlCommandBuilder(daPermiso);
+            cbPermisoRelacion = new SqlCommandBuilder(daPermisoRelacion);
 
             mainDataSet = new DataSet("Users");
-            DataTable dtUsers = new DataTable("Usuario");
-            DataTable dtBitacora = new DataTable("Bitacora");
-            mainDataSet.Tables.Add(dtUsers);
-            mainDataSet.Tables.Add(dtBitacora);
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
                 if (conn.State != ConnectionState.Open) throw new Exception("Conexión a base de datos fallida");
 
-                daUsers.Fill(dtUsers);
-                daBitacora.Fill(dtBitacora);
+                CargarTablaConEsquema(daUsers, "Usuario", conn);
+                CargarTablaConEsquema(daBitacora, "Bitacora", conn);
+                CargarTablaConEsquema(daPermiso, "Permiso", conn);
+                CargarTablaConEsquema(daPermisoRelacion, "PermisoRelacion", conn);
             }
 
-            DataColumn columnaIdRegistro = dtBitacora.Columns[0];
-            dtBitacora.PrimaryKey = new DataColumn[] { columnaIdRegistro };
+            ConfigurarAutoincrementoGeneral();
+            ArmarRelaciones();
+        }
+
+        private void CargarTablaConEsquema(SqlDataAdapter adapter, string tableName, SqlConnection connection)
+        {
+            if (adapter.SelectCommand == null)
+            {
+                adapter.SelectCommand = new SqlCommand();
+            }
+
+            adapter.SelectCommand.CommandText = $"Select * From {tableName}";
+            adapter.SelectCommand.Connection = connection;
+
+            adapter.FillSchema(mainDataSet, SchemaType.Source, tableName);
+            adapter.Fill(mainDataSet, tableName);
+        }
+
+        private void ArmarRelaciones()
+        {
+            DataTable? dtPermiso = mainDataSet.Tables["Permiso"];
+            DataTable? dtPermisoRelacion = mainDataSet.Tables["PermisoRelacion"];
+
+            if (dtPermiso == null || dtPermisoRelacion == null) throw new Exception("Error en el armado de relaciones DAO");
+
+            DataRelation drPermisoPadre = new DataRelation(
+                "FK_PermisoRelacion_Padre",
+                dtPermiso.Columns["ID"]!,
+                dtPermisoRelacion.Columns["ID_Padre"]!
+            );
+
+            DataRelation drPermisoHijo = new DataRelation(
+                "FK_PermisoRelacion_Hijo",
+                dtPermiso.Columns["ID"]!,
+                dtPermisoRelacion.Columns["ID_Hijo"]!
+            );
+
+            mainDataSet.Relations.Add(drPermisoPadre);
+            mainDataSet.Relations.Add(drPermisoHijo);
+        }
+
+        private void ConfigurarAutoincrementoGeneral()
+        {
+            if (!mainDataSet.Tables.Contains("Bitacora") || !mainDataSet.Tables.Contains("Permiso")) return;
+
+            DataTable dtBitacora = mainDataSet.Tables["Bitacora"]!;
+            DataTable dtPermiso = mainDataSet.Tables["Permiso"]!;
+
+            if (!dtBitacora.Columns.Contains("ID") || !dtPermiso.Columns.Contains("ID")) return;
+
+            DataColumn columnaIdRegistroBitacora = dtBitacora.Columns["ID"]!;
             int maxId = 0;
 
             if (dtBitacora.Rows.Count > 0)
             {
-                maxId = dtBitacora.AsEnumerable().Max(r => r.Field<int>("ID"));
+                maxId = dtBitacora.AsEnumerable()
+                    .Max(r => r["ID"] == DBNull.Value ? 0 : Convert.ToInt32(r["ID"]));
             }
 
-            columnaIdRegistro.AutoIncrement = true;
-            columnaIdRegistro.AutoIncrementSeed = maxId + 1;
-            columnaIdRegistro.AutoIncrementStep = 1;
+            columnaIdRegistroBitacora.AutoIncrement = true;
+            columnaIdRegistroBitacora.AutoIncrementSeed = maxId + 1;
+            columnaIdRegistroBitacora.AutoIncrementStep = 1;
 
-            dtUsers.PrimaryKey = new DataColumn[] { dtUsers.Columns[0] };
+            DataColumn columnaIdRegistroPermiso = dtPermiso.Columns["ID"]!;
+            int maxIdPermiso = 0;
 
-            drUsuarioBitacora = new DataRelation("FK_Bitacora_Usuario", dtUsers.Columns[0], dtBitacora.Columns[1]);
-            mainDataSet.Relations.Add(drUsuarioBitacora);
+            if (dtPermiso.Rows.Count > 0)
+            {
+                maxIdPermiso = dtPermiso.AsEnumerable()
+                    .Max(r => r["ID"] == DBNull.Value ? 0 : Convert.ToInt32(r["ID"]));
+            }
+
+            columnaIdRegistroPermiso.AutoIncrement = true;
+            columnaIdRegistroPermiso.AutoIncrementSeed = maxIdPermiso + 1;
+            columnaIdRegistroPermiso.AutoIncrementStep = 1;
         }
 
         public static DAO GetInstance
@@ -110,6 +174,8 @@ namespace DAL
 
                 daUsers.SelectCommand.Connection = conn;
                 daBitacora.SelectCommand.Connection = conn;
+                daPermiso.SelectCommand.Connection = conn;
+                daPermisoRelacion.SelectCommand.Connection = conn;
 
                 daUsers.InsertCommand = cbUsers.GetInsertCommand();
                 daUsers.UpdateCommand = cbUsers.GetUpdateCommand();
@@ -125,8 +191,24 @@ namespace DAL
                 daBitacora.UpdateCommand.Connection = conn;
                 daBitacora.DeleteCommand.Connection = conn;
 
+                daPermiso.InsertCommand = cbPermiso.GetInsertCommand();
+                daPermiso.UpdateCommand = cbPermiso.GetUpdateCommand();
+                daPermiso.DeleteCommand = cbPermiso.GetDeleteCommand();
+                daPermiso.InsertCommand.Connection = conn;
+                daPermiso.UpdateCommand.Connection = conn;
+                daPermiso.DeleteCommand.Connection = conn;
+
+                daPermisoRelacion.InsertCommand = cbPermisoRelacion.GetInsertCommand();
+                daPermisoRelacion.UpdateCommand = cbPermisoRelacion.GetUpdateCommand();
+                daPermisoRelacion.DeleteCommand = cbPermisoRelacion.GetDeleteCommand();
+                daPermisoRelacion.InsertCommand.Connection = conn;
+                daPermisoRelacion.UpdateCommand.Connection = conn;
+                daPermisoRelacion.DeleteCommand.Connection = conn;
+
                 daUsers.Update(mainDataSet, "Usuario");
                 daBitacora.Update(mainDataSet, "Bitacora");
+                daPermiso.Update(mainDataSet, "Permiso");
+                daPermisoRelacion.Update(mainDataSet, "PermisoRelacion");
 
                 mainDataSet.AcceptChanges();
             }
