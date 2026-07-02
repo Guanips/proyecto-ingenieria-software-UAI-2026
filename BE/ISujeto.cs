@@ -2,8 +2,8 @@
 {
     public interface ISujeto
     {
-        public abstract void Attach(IObserver observer);
-        public abstract void Detach(IObserver observer);
-        public abstract void Notificar(Usuario usuarioInvolucrado, string accion);
+        public void Attach(IObserver observer);
+        public void Detach(IObserver observer);
+        public void Notificar(Usuario usuarioInvolucrado, string accion);
     }
 }

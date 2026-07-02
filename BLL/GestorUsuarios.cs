@@ -26,8 +26,7 @@ namespace BLL
         {
             foreach (IObserver item in ObserversAttached)
             {
-                item.Update(usuarioInvolucrado, action)
-;
+                item.Update(usuarioInvolucrado, action);
             }
         }
 
