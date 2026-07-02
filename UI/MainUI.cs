@@ -14,7 +14,7 @@ namespace UI
             this.IsMdiContainer = true;
         }
 
-        private void cargarFormulario(Form formulario) 
+        private void cargarFormulario(Form formulario)
         {
             if (formCargadoActualmente != null)
             {
@@ -49,8 +49,8 @@ namespace UI
 
         private void mainUIStripMenuItemIniciarSesion_Click(object sender, EventArgs e)
         {
-           LoginUI loginUI = new LoginUI();
-           cargarFormulario(loginUI);
+            LoginUI loginUI = new LoginUI();
+            cargarFormulario(loginUI);
         }
 
         private void mainUIStripMenuItemCerrarSesion_Click(object sender, EventArgs e)

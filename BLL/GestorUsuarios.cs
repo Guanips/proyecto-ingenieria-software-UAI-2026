@@ -1,11 +1,6 @@
 ﻿using BE;
 using DAL;
 using servicios;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BLL
 {
@@ -13,7 +8,7 @@ namespace BLL
     {
         private List<IObserver> ObserversAttached = new List<IObserver>();
 
-        public GestorUsuarios () { }
+        public GestorUsuarios() { }
 
         public void Attach(IObserver observer)
         {
@@ -32,7 +27,37 @@ namespace BLL
             foreach (IObserver item in ObserversAttached)
             {
                 item.Update(usuarioInvolucrado, action)
-;           }
+;
+            }
+        }
+
+        public List<Usuario> ListarUsuarios()
+        {
+            RepositorioUsuarios repositorioUsuarios = RepositorioUsuarios.GetInstance;
+            return repositorioUsuarios.ObtenerListadoTotalUsuarios();
+        }
+
+        public void RegistrarUsuario(string nUsername, string nPassword, string nEmail, string nNumTelefono)
+        {
+            bool usuarioExiste = RepositorioUsuarios.GetInstance.VerificarExistenciaDeUsername(nUsername);
+            if (usuarioExiste) throw new Exception("El usuario ya existe");
+
+            string passwordHash = CryptoService.EncriptarPassword(nPassword);
+
+            Usuario nuevoUsuario = new Usuario(Guid.NewGuid(), nUsername, passwordHash, nEmail, nNumTelefono, false);
+            RepositorioUsuarios.GetInstance.AgregarUsuario(nuevoUsuario);
+        }
+
+        public void EliminarUsuario(string nUsername)
+        {
+            RepositorioUsuarios.GetInstance.EliminarUsuario(nUsername);
+        }
+
+        public void ModificarUsuario(string nUsername, string nEmail, string nNumTelefono)
+        {
+            Usuario usuarioObtenido = RepositorioUsuarios.GetInstance.ObtenerUsuario(nUsername);
+            Usuario usuarioModificado = new Usuario(usuarioObtenido.Id, nUsername, usuarioObtenido.PasswordHash, nEmail, nNumTelefono, usuarioObtenido.EstaBloqueado);
+            RepositorioUsuarios.GetInstance.ModificarUsuario(usuarioModificado);
         }
     }
 }

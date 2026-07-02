@@ -1,18 +1,12 @@
 ﻿using BE;
 using DAL;
 using servicios;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Collections.Specialized.BitVector32;
 
 namespace BLL
 {
     public class GestorLogin : ISujeto
     {
-        public GestorLogin () {}
+        public GestorLogin() { }
 
         private List<IObserver> ObserversAttached = new List<IObserver>();
 
@@ -39,7 +33,7 @@ namespace BLL
         {
             RepositorioUsuarios RepoUsuarios = RepositorioUsuarios.GetInstance;
             if (!RepoUsuarios.VerificarExistenciaDeUsername(usuario)) throw new Exception("Usuario incorrecto");
-            Usuario _user = RepoUsuarios.ObtenerUsuarioPorNombre(usuario);
+            Usuario _user = RepoUsuarios.ObtenerUsuario(usuario);
             string hash = CryptoService.EncriptarPassword(pass);
             if (!CryptoService.Comparer(hash, _user.PasswordHash)) throw new Exception("Contraseña incorrecta");
             SessionManager.getInstance.LogIn(_user);

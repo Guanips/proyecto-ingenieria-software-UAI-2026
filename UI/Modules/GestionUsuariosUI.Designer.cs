@@ -30,7 +30,7 @@
         {
             gestionUsuariosUIGroupBoxAltaUsuario = new GroupBox();
             gestionUsuariosUIButtonConfirmarRegistrarUsuario = new Button();
-            textBoxRegistroConstrasena = new TextBox();
+            textBoxRegistroRepetirConstrasena = new TextBox();
             gestionUsuariosUIRegistroLabelConfirmContrasena = new Label();
             textBoxRegistroContrasena = new TextBox();
             gestionUsuariosUIRegistroLabelContrasena = new Label();
@@ -58,7 +58,7 @@
             // gestionUsuariosUIGroupBoxAltaUsuario
             // 
             gestionUsuariosUIGroupBoxAltaUsuario.Controls.Add(gestionUsuariosUIButtonConfirmarRegistrarUsuario);
-            gestionUsuariosUIGroupBoxAltaUsuario.Controls.Add(textBoxRegistroConstrasena);
+            gestionUsuariosUIGroupBoxAltaUsuario.Controls.Add(textBoxRegistroRepetirConstrasena);
             gestionUsuariosUIGroupBoxAltaUsuario.Controls.Add(gestionUsuariosUIRegistroLabelConfirmContrasena);
             gestionUsuariosUIGroupBoxAltaUsuario.Controls.Add(textBoxRegistroContrasena);
             gestionUsuariosUIGroupBoxAltaUsuario.Controls.Add(gestionUsuariosUIRegistroLabelContrasena);
@@ -85,12 +85,12 @@
             gestionUsuariosUIButtonConfirmarRegistrarUsuario.UseVisualStyleBackColor = true;
             gestionUsuariosUIButtonConfirmarRegistrarUsuario.Click += gestionUsuariosUIButtonConfirmarRegistrarUsuario_Click;
             // 
-            // textBoxRegistroConstrasena
+            // textBoxRegistroRepetirConstrasena
             // 
-            textBoxRegistroConstrasena.Location = new Point(142, 132);
-            textBoxRegistroConstrasena.Name = "textBoxRegistroConstrasena";
-            textBoxRegistroConstrasena.Size = new Size(144, 23);
-            textBoxRegistroConstrasena.TabIndex = 9;
+            textBoxRegistroRepetirConstrasena.Location = new Point(142, 132);
+            textBoxRegistroRepetirConstrasena.Name = "textBoxRegistroRepetirConstrasena";
+            textBoxRegistroRepetirConstrasena.Size = new Size(144, 23);
+            textBoxRegistroRepetirConstrasena.TabIndex = 9;
             // 
             // gestionUsuariosUIRegistroLabelConfirmContrasena
             // 
@@ -190,9 +190,13 @@
             // 
             dataGridViewListadoUsuarios.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewListadoUsuarios.Location = new Point(6, 22);
+            dataGridViewListadoUsuarios.MultiSelect = false;
             dataGridViewListadoUsuarios.Name = "dataGridViewListadoUsuarios";
+            dataGridViewListadoUsuarios.ReadOnly = true;
+            dataGridViewListadoUsuarios.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridViewListadoUsuarios.Size = new Size(598, 397);
             dataGridViewListadoUsuarios.TabIndex = 0;
+            dataGridViewListadoUsuarios.SelectionChanged += dataGridViewListadoUsuarios_SelectionChanged;
             // 
             // gestionUsuariosUIGroupBoxModificacionUsuarios
             // 
@@ -263,6 +267,7 @@
             Name = "GestionUsuariosUI";
             Text = "GestionUsuariosUI";
             WindowState = FormWindowState.Maximized;
+            Load += GestionUsuariosUI_Load;
             gestionUsuariosUIGroupBoxAltaUsuario.ResumeLayout(false);
             gestionUsuariosUIGroupBoxAltaUsuario.PerformLayout();
             gestionUsuariosUIGroupBoxListadoUsuarios.ResumeLayout(false);
@@ -276,7 +281,7 @@
 
         private GroupBox gestionUsuariosUIGroupBoxAltaUsuario;
         private Button gestionUsuariosUIButtonConfirmarRegistrarUsuario;
-        private TextBox textBoxRegistroConstrasena;
+        private TextBox textBoxRegistroRepetirConstrasena;
         private Label gestionUsuariosUIRegistroLabelConfirmContrasena;
         private TextBox textBoxRegistroContrasena;
         private Label gestionUsuariosUIRegistroLabelContrasena;

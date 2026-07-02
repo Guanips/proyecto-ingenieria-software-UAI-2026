@@ -2,14 +2,20 @@
 {
     public class Usuario : Entidad
     {
-        public string Username { get; set; }
-        public string PasswordHash { get; set; }
+        public string Username { get; private set; }
+        public string PasswordHash { get; private set; }
+        public string NumTelefono { get; private set; }
+        public string Email { get; private set; }
+        public bool EstaBloqueado { get; private set; }
 
-        public Usuario(Guid id,string nUsername, string nPasswordHash)
+        public Usuario(Guid id, string nUsername, string nPasswordHash, string nEmail, string nNumTelefono, bool estaBloqueado)
         {
             Id = id;
             Username = nUsername;
             PasswordHash = nPasswordHash;
+            Email = nEmail;
+            NumTelefono = nNumTelefono;
+            EstaBloqueado = estaBloqueado;
         }
     }
 

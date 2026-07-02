@@ -6,7 +6,7 @@ namespace BLL
     {
         // implementacion del singleton
         private static SessionManager? Instance;
-        private SessionManager () { }
+        private SessionManager() { }
         public static SessionManager getInstance
         {
             get

@@ -5,9 +5,9 @@ namespace DAL
 {
     public class RepositorioBitacora
     {
-        public RepositorioBitacora() {}
+        public RepositorioBitacora() { }
 
-        public List<Registro> ListarRegistros () => MappearRegistros();
+        public List<Registro> ListarRegistros() => MappearRegistros();
         private List<Registro> MappearRegistros()
         {
             DAO dao = DAO.GetInstance;
@@ -25,7 +25,7 @@ namespace DAL
             }
             return _listRegistro;
         }
-        public void AlmacenarRegistro (Registro nRegistro, string idUsuarioInvolucrado) 
+        public void AlmacenarRegistro(Registro nRegistro, string idUsuarioInvolucrado)
         {
             DAO dao = DAO.GetInstance;
             DataSet ds = dao.ObtenerDataSet();

@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Data.SqlClient;
 using System.Data;
-using System.IO;
-using BE;
 
 namespace DAL
 {
     public class DAO
     {
         private static DAO? Instance;
+        private static readonly object _lock = new object();
 
         private DataSet mainDataSet;
         private SqlCommandBuilder cbUsers, cbBitacora;
@@ -44,7 +38,6 @@ namespace DAL
                 daBitacora.Fill(dtBitacora);
             }
 
-            // Config de PK para Bitacora
             DataColumn columnaIdRegistro = dtBitacora.Columns[0];
             dtBitacora.PrimaryKey = new DataColumn[] { columnaIdRegistro };
             int maxId = 0;
@@ -58,10 +51,8 @@ namespace DAL
             columnaIdRegistro.AutoIncrementSeed = maxId + 1;
             columnaIdRegistro.AutoIncrementStep = 1;
 
-            // Config de PK para Usuarios
             dtUsers.PrimaryKey = new DataColumn[] { dtUsers.Columns[0] };
 
-            // Config de relación usuario -> registro
             drUsuarioBitacora = new DataRelation("FK_Bitacora_Usuario", dtUsers.Columns[0], dtBitacora.Columns[1]);
             mainDataSet.Relations.Add(drUsuarioBitacora);
         }
@@ -72,7 +63,13 @@ namespace DAL
             {
                 if (Instance == null)
                 {
-                    Instance = new DAO();
+                    lock (_lock)
+                    {
+                        if (Instance == null)
+                        {
+                            Instance = new DAO();
+                        }
+                    }
                 }
                 return Instance;
             }
@@ -113,6 +110,20 @@ namespace DAL
 
                 daUsers.SelectCommand.Connection = conn;
                 daBitacora.SelectCommand.Connection = conn;
+
+                daUsers.InsertCommand = cbUsers.GetInsertCommand();
+                daUsers.UpdateCommand = cbUsers.GetUpdateCommand();
+                daUsers.DeleteCommand = cbUsers.GetDeleteCommand();
+                daUsers.InsertCommand.Connection = conn;
+                daUsers.UpdateCommand.Connection = conn;
+                daUsers.DeleteCommand.Connection = conn;
+
+                daBitacora.InsertCommand = cbBitacora.GetInsertCommand();
+                daBitacora.UpdateCommand = cbBitacora.GetUpdateCommand();
+                daBitacora.DeleteCommand = cbBitacora.GetDeleteCommand();
+                daBitacora.InsertCommand.Connection = conn;
+                daBitacora.UpdateCommand.Connection = conn;
+                daBitacora.DeleteCommand.Connection = conn;
 
                 daUsers.Update(mainDataSet, "Usuario");
                 daBitacora.Update(mainDataSet, "Bitacora");
