@@ -165,38 +165,6 @@ namespace DAL
 
         private void ConfigurarAutoincrementoGeneral()
         {
-            //if (!mainDataSet.Tables.Contains("Bitacora") || !mainDataSet.Tables.Contains("Permiso")) return;
-
-            //DataTable dtBitacora = mainDataSet.Tables["Bitacora"]!;
-            //DataTable dtPermiso = mainDataSet.Tables["Permiso"]!;
-
-            //if (!dtBitacora.Columns.Contains("ID") || !dtPermiso.Columns.Contains("ID")) return;
-
-            //DataColumn columnaIdRegistroBitacora = dtBitacora.Columns["ID"]!;
-            //int maxId = 0;
-
-            //if (dtBitacora.Rows.Count > 0)
-            //{
-            //    maxId = dtBitacora.AsEnumerable()
-            //        .Max(r => r["ID"] == DBNull.Value ? 0 : Convert.ToInt32(r["ID"]));
-            //}
-
-            //columnaIdRegistroBitacora.AutoIncrement = true;
-            //columnaIdRegistroBitacora.AutoIncrementSeed = maxId + 1;
-            //columnaIdRegistroBitacora.AutoIncrementStep = 1;
-
-            //DataColumn columnaIdRegistroPermiso = dtPermiso.Columns["ID"]!;
-            //int maxIdPermiso = 0;
-
-            //if (dtPermiso.Rows.Count > 0)
-            //{
-            //    maxIdPermiso = dtPermiso.AsEnumerable()
-            //        .Max(r => r["ID"] == DBNull.Value ? 0 : Convert.ToInt32(r["ID"]));
-            //}
-
-            //columnaIdRegistroPermiso.AutoIncrement = true;
-            //columnaIdRegistroPermiso.AutoIncrementSeed = maxIdPermiso + 1;
-            //columnaIdRegistroPermiso.AutoIncrementStep = 1;
             if (mainDataSet.Tables.Contains("Bitacora") && mainDataSet.Tables["Bitacora"]!.Columns.Contains("ID"))
             {
                 DataTable dtBitacora = mainDataSet.Tables["Bitacora"]!;
