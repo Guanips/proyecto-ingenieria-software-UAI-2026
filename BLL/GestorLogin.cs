@@ -6,9 +6,9 @@ namespace BLL
 {
     public class GestorLogin : ISujeto
     {
-        public GestorLogin() { }
-
         private List<IObserver> ObserversAttached = new List<IObserver>();
+        public GestorLogin() { Attach(new GestorBitacora()); }
+
 
         public void Attach(IObserver observer)
         {

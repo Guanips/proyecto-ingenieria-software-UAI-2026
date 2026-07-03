@@ -90,10 +90,31 @@ namespace UI.Modules
             AplicarFiltros();
         }
 
+        //protected override void TraducirElementosParticulares(string codigoIdioma)
+        //{
+        //    var traducciones = GestorIdioma.GetInstance.ObtenerTraduccionesActuales(codigoIdioma);
+
+        //    if (dataGridViewBitacora.Columns.Count > 0)
+        //    {
+        //        if (traducciones.ContainsKey("GridBitacora_Usuario") && dataGridViewBitacora.Columns["Usuario"] != null)
+        //            dataGridViewBitacora.Columns["Usuario"].HeaderText = traducciones["GridBitacora_Usuario"];
+
+        //        if (traducciones.ContainsKey("GridBitacora_Fecha") && dataGridViewBitacora.Columns["FechaHora"] != null)
+        //            dataGridViewBitacora.Columns["FechaHora"].HeaderText = traducciones["GridBitacora_Fecha"];
+
+        //        if (traducciones.ContainsKey("GridBitacora_Accion") && dataGridViewBitacora.Columns["AccionRealizada"] != null)
+        //            dataGridViewBitacora.Columns["AccionRealizada"].HeaderText = traducciones["GridBitacora_Accion"];
+        //    }
+        //}
         protected override void TraducirElementosParticulares(string codigoIdioma)
         {
-            var traducciones = GestorIdioma.GetInstance.ObtenerTraduccionesActuales(codigoIdioma);
+            // 1. CONTROL DE SEGURIDAD: Si el DataGridView o el diccionario no existen, salimos rápido sin romper
+            if (dataGridViewBitacora == null) return;
 
+            var traducciones = GestorIdioma.GetInstance.ObtenerTraduccionesActuales(codigoIdioma);
+            if (traducciones == null) return;
+
+            // 2. EJECUCIÓN DE TRADUCCIÓN: Ahora es 100% seguro interactuar con los objetos
             if (dataGridViewBitacora.Columns.Count > 0)
             {
                 if (traducciones.ContainsKey("GridBitacora_Usuario") && dataGridViewBitacora.Columns["Usuario"] != null)

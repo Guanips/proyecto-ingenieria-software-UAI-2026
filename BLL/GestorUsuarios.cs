@@ -8,7 +8,7 @@ namespace BLL
     {
         private List<IObserver> ObserversAttached = new List<IObserver>();
 
-        public GestorUsuarios() { }
+        public GestorUsuarios() { Attach(new GestorBitacora()); }
 
         public void Attach(IObserver observer)
         {
