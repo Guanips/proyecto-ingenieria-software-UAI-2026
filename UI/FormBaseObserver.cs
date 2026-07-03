@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Windows.Forms;
-using BE;
+﻿using BE;
 using BLL;
 using servicios;
+using System.ComponentModel;
 
 namespace UI
 {
@@ -12,7 +9,7 @@ namespace UI
     {
         public FormBaseObserver()
         {
-            
+
         }
 
         protected override void OnLoad(EventArgs e)
@@ -33,7 +30,7 @@ namespace UI
             return processName.Contains("devenv") || processName.Contains("DesignToolsServer");
         }
 
-        public virtual void Update(Usuario usuarioInvolucrado, string action)
+        public virtual void Update(string username, string action)
         {
             if (action.StartsWith("Idioma:"))
             {
@@ -49,7 +46,7 @@ namespace UI
 
         protected virtual void TraducirElementosParticulares(string codigoIdioma)
         {
-            
+
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)

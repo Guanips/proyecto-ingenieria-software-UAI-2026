@@ -176,7 +176,7 @@ namespace UI
             GestorIdioma.GetInstance.CambiarIdioma(idiomaSeleccionado.Codigo);
         }
 
-        public void Update(Usuario usuarioInvolucrado, string action)
+        public void Update(string username, string action)
         {
             if (action.StartsWith("Idioma:"))
             {

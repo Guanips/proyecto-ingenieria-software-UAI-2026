@@ -1,12 +1,5 @@
 ﻿using BE;
 using DAL;
-using servicios;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BLL
 {
@@ -53,7 +46,7 @@ namespace BLL
             Usuario? activo = SessionManager.getInstance.ObtenerUsuarioActivo();
             // CORRECCIÓN: Se agregó el ', 0' al final del constructor
             Usuario dummy = activo ?? new Usuario(Guid.Empty, "invitado", "", "", "", false, _idiomaActual, 0);
-            observer.Update(dummy, $"Idioma:{_idiomaActual}");
+            observer.Update(dummy.Username, $"Idioma:{_idiomaActual}");
         }
 
         public void Detach(IObserver observer)
@@ -61,14 +54,14 @@ namespace BLL
             ObserversAttached.Remove(observer);
         }
 
-        public void Notificar(Usuario usuarioInvolucrado, string accion)
+        public void Notificar(string username, string accion)
         {
             foreach (IObserver item in ObserversAttached)
             {
-                item.Update(usuarioInvolucrado, accion);
+                item.Update(username, accion);
             }
         }
-        
+
 
         public void CambiarIdioma(string nuevoIdioma)
         {
@@ -88,13 +81,13 @@ namespace BLL
                     DAO.GetInstance.SubirCambiosBD();
                 }
 
-                Notificar(usuarioActivo, $"Idioma:{nuevoIdioma}");
+                Notificar(usuarioActivo.Username, $"Idioma:{nuevoIdioma}");
             }
             else
             {
                 // CORRECCIÓN: Se agregó el ', 0' al final del constructor
                 Usuario temporal = new Usuario(Guid.Empty, "invitado", "", "", "", false, nuevoIdioma, 0);
-                Notificar(temporal, $"Idioma:{nuevoIdioma}");
+                Notificar(temporal.Username, $"Idioma:{nuevoIdioma}");
             }
         }
         public string TraducirMensaje(string keyEtiqueta, string mensajePorDefecto)

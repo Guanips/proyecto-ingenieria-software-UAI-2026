@@ -39,8 +39,6 @@
             mainUIStripMenuItemABMPerfiles = new ToolStripMenuItem();
             mainUIStripMenuItemBitacora = new ToolStripMenuItem();
             mainUIStripMenuItemConsultarBitacora = new ToolStripMenuItem();
-            mainUIStripMenuItemPerfiles = new ToolStripMenuItem();
-            mainUIStripMenuItemGestionarPerfiles = new ToolStripMenuItem();
             comboIdiomasGlobal = new ComboBox();
             label1 = new Label();
             menuStrip1.SuspendLayout();
@@ -48,7 +46,7 @@
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { mainUIStripMenuItemInicio, mainUIStripMenuItemGestionDeUsuarios, mainUIStripMenuItemGestionDePerfiles, mainUIStripMenuItemBitacora, mainUIStripMenuItemPerfiles });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { mainUIStripMenuItemInicio, mainUIStripMenuItemGestionDeUsuarios, mainUIStripMenuItemGestionDePerfiles, mainUIStripMenuItemBitacora });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(1127, 24);
@@ -65,14 +63,14 @@
             // mainUIStripMenuItemIniciarSesion
             // 
             mainUIStripMenuItemIniciarSesion.Name = "mainUIStripMenuItemIniciarSesion";
-            mainUIStripMenuItemIniciarSesion.Size = new Size(142, 22);
+            mainUIStripMenuItemIniciarSesion.Size = new Size(180, 22);
             mainUIStripMenuItemIniciarSesion.Text = "Iniciar sesion";
             mainUIStripMenuItemIniciarSesion.Click += mainUIStripMenuItemIniciarSesion_Click;
             // 
             // mainUIStripMenuItemCerrarSesion
             // 
             mainUIStripMenuItemCerrarSesion.Name = "mainUIStripMenuItemCerrarSesion";
-            mainUIStripMenuItemCerrarSesion.Size = new Size(142, 22);
+            mainUIStripMenuItemCerrarSesion.Size = new Size(180, 22);
             mainUIStripMenuItemCerrarSesion.Text = "Cerrar sesion";
             mainUIStripMenuItemCerrarSesion.Click += mainUIStripMenuItemCerrarSesion_Click;
             // 
@@ -121,22 +119,9 @@
             // mainUIStripMenuItemConsultarBitacora
             // 
             mainUIStripMenuItemConsultarBitacora.Name = "mainUIStripMenuItemConsultarBitacora";
-            mainUIStripMenuItemConsultarBitacora.Size = new Size(171, 22);
+            mainUIStripMenuItemConsultarBitacora.Size = new Size(180, 22);
             mainUIStripMenuItemConsultarBitacora.Text = "Consultar bitacora";
             mainUIStripMenuItemConsultarBitacora.Click += mainUIStripMenuItemConsultarBitacora_Click;
-            // 
-            // mainUIStripMenuItemPerfiles
-            // 
-            mainUIStripMenuItemPerfiles.DropDownItems.AddRange(new ToolStripItem[] { mainUIStripMenuItemGestionarPerfiles });
-            mainUIStripMenuItemPerfiles.Name = "mainUIStripMenuItemPerfiles";
-            mainUIStripMenuItemPerfiles.Size = new Size(57, 20);
-            mainUIStripMenuItemPerfiles.Text = "Perfiles";
-            // 
-            // mainUIStripMenuItemGestionarPerfiles
-            // 
-            mainUIStripMenuItemGestionarPerfiles.Name = "mainUIStripMenuItemGestionarPerfiles";
-            mainUIStripMenuItemGestionarPerfiles.Size = new Size(165, 22);
-            mainUIStripMenuItemGestionarPerfiles.Text = "Gestionar perfiles";
             // 
             // comboIdiomasGlobal
             // 
@@ -187,8 +172,6 @@
         private ToolStripMenuItem mainUIStripMenuItemABMPerfiles;
         private ToolStripMenuItem mainUIStripMenuItemBitacora;
         private ToolStripMenuItem mainUIStripMenuItemConsultarBitacora;
-        private ToolStripMenuItem mainUIStripMenuItemPerfiles;
-        private ToolStripMenuItem mainUIStripMenuItemGestionarPerfiles;
         private ComboBox comboIdiomasGlobal;
         private Label label1;
     }
