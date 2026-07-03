@@ -16,56 +16,68 @@ namespace servicios
 
         public static ValidationResult ValidateUsername(string username)
         {
-            if (string.IsNullOrWhiteSpace(username)) return new ValidationResult(false, "El nombre de usuario no puede estar vacio");
+            if (string.IsNullOrWhiteSpace(username))
+                return new ValidationResult(false, "err_UsernameVacio");
 
             bool isValid = UsernameRegex.IsMatch(username.Trim());
             if (isValid) return new ValidationResult(true);
-            return new ValidationResult(false, "El nombre de usuario debe tener entre 3 y 16 caracteres y solo puede contener letras, números, guiones bajos y guiones");
+
+            return new ValidationResult(false, "err_UsernameFormato");
         }
 
         public static ValidationResult ValidateEmail(string email)
         {
-            if (string.IsNullOrWhiteSpace(email)) return new ValidationResult(false, "El correo electrónico no puede estar vacío");
+            if (string.IsNullOrWhiteSpace(email))
+                return new ValidationResult(false, "err_EmailVacio");
 
             bool isValid = EmailRegex.IsMatch(email.Trim());
             if (isValid) return new ValidationResult(true);
-            return new ValidationResult(false, "El formato del correo electrónico no es válido");
+
+            return new ValidationResult(false, "err_EmailFormato");
         }
 
         public static ValidationResult ValidatePhone(string phone)
         {
-            if (string.IsNullOrWhiteSpace(phone)) return new ValidationResult(false, "El número de teléfono no puede estar vacío");
+            if (string.IsNullOrWhiteSpace(phone))
+                return new ValidationResult(false, "err_PhoneVacio");
 
             bool isValid = PhoneRegex.IsMatch(phone.Trim());
             if (isValid) return new ValidationResult(true);
-            return new ValidationResult(false, "El formato del número de teléfono no es válido");
+
+            return new ValidationResult(false, "err_PhoneFormato");
         }
 
         public static ValidationResult ValidateOnlyLetters(string text)
         {
-            if (string.IsNullOrWhiteSpace(text)) return new ValidationResult(false, "El campo de texto no puede estar vacío");
+            if (string.IsNullOrWhiteSpace(text))
+                return new ValidationResult(false, "err_OnlyLettersVacio");
 
             bool isValid = OnlyLettersRegex.IsMatch(text.Trim());
             if (isValid) return new ValidationResult(true);
-            return new ValidationResult(false, "El campo solo puede contener letras y espacios (se permiten acentos y eñes)");
+
+            return new ValidationResult(false, "err_OnlyLettersFormato");
         }
 
         public static ValidationResult ValidateAlphaNumericStrict(string text)
         {
-            if (string.IsNullOrWhiteSpace(text)) return new ValidationResult(false, "El código o ID no puede estar vacío");
+            if (string.IsNullOrWhiteSpace(text))
+                return new ValidationResult(false, "err_AlphaNumStrictVacio");
 
             bool isValid = AlphaNumericStrictRegex.IsMatch(text.Trim());
             if (isValid) return new ValidationResult(true);
-            return new ValidationResult(false, "El campo solo puede contener letras (sin acentos) y números, sin espacios");
+
+            return new ValidationResult(false, "err_AlphaNumStrictFormato");
         }
 
         public static ValidationResult ValidateAlphaNumericWithSpaces(string text)
         {
-            if (string.IsNullOrWhiteSpace(text)) return new ValidationResult(false, "El texto no puede estar vacío");
+            if (string.IsNullOrWhiteSpace(text))
+                return new ValidationResult(false, "err_AlphaNumSpacesVacio");
 
             bool isValid = AlphaNumericWithSpacesRegex.IsMatch(text.Trim());
             if (isValid) return new ValidationResult(true);
-            return new ValidationResult(false, "El campo solo puede contener letras, números y espacios (sin caracteres especiales)");
+
+            return new ValidationResult(false, "err_AlphaNumSpacesFormato");
         }
 
         public static ValidationResult ValidateProfileName(string profileName)

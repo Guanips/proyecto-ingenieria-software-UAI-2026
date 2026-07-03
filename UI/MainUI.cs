@@ -1,11 +1,12 @@
 using BE;
 using BLL;
+using servicios;
 using UI.Login;
 using UI.Modules;
 
 namespace UI
 {
-    public partial class MainUI : Form
+    public partial class MainUI : Form, IObserver
     {
         private Form? formCargadoActualmente;
 
@@ -13,6 +14,7 @@ namespace UI
         {
             InitializeComponent();
             this.IsMdiContainer = true;
+            GestorIdioma.GetInstance.Attach(this);
             foreach (ToolStripMenuItem item in menuStrip1.Items)
             {
                 item.Enabled = false;
@@ -72,6 +74,26 @@ namespace UI
             cargarFormulario(loginUI);
 
             mainUIStripMenuItemCerrarSesion.Enabled = false;
+
+            var listaIdiomas = GestorIdioma.GetInstance.ObtenerIdiomasDisponibles();
+
+            comboIdiomasGlobal.SelectedIndexChanged -= ComboIdiomasGlobal_SelectedIndexChanged;
+
+            comboIdiomasGlobal.DataSource = listaIdiomas;
+            comboIdiomasGlobal.DisplayMember = "Nombre";
+            comboIdiomasGlobal.ValueMember = "Codigo";
+
+            Usuario? usuarioActivo = SessionManager.getInstance.ObtenerUsuarioActivo();
+            if (usuarioActivo != null && !string.IsNullOrEmpty(usuarioActivo.Idioma))
+            {
+                comboIdiomasGlobal.SelectedValue = usuarioActivo.Idioma;
+            }
+            else
+            {
+                comboIdiomasGlobal.SelectedValue = "ES";
+            }
+            comboIdiomasGlobal.SelectedIndexChanged += ComboIdiomasGlobal_SelectedIndexChanged;
+
         }
 
         private void mainUIStripMenuItemIniciarSesion_Click(object sender, EventArgs e)
@@ -82,15 +104,41 @@ namespace UI
 
         private void mainUIStripMenuItemCerrarSesion_Click(object sender, EventArgs e)
         {
-            SessionManager sessionManager = SessionManager.getInstance;
-            sessionManager.LogOut();
-            MessageBox.Show("Sesi髇 cerrada correctamente.", "Cerrar sesi髇", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //SessionManager sessionManager = SessionManager.getInstance;
+            //sessionManager.LogOut();
+
+            //string mensaje = GestorIdioma.GetInstance.TraducirMensaje("msg_CierreSesionExito", "Sesi贸n cerrada correctamente.");
+            //string titulo = GestorIdioma.GetInstance.TraducirMensaje("msg_TituloCierreSesion", "Cerrar sesi贸n");
+
+            //MessageBox.Show(mensaje, titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            ////MessageBox.Show("Sesi贸n cerrada correctamente.", "Cerrar sesi贸n", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //LoginUI loginUI = new LoginUI();
+            //cargarFormulario(loginUI);
+            //foreach (ToolStripMenuItem item in menuStrip1.Items)
+            //{
+            //    item.Enabled = false;
+            //}
+            //mainUIStripMenuItemCerrarSesion.Enabled = false;
+            //mainUIStripMenuItemIniciarSesion.Enabled = true;
+            GestorLogin gestorLogin = new GestorLogin();
+
+            // 2. Ejecutamos el cierre a trav茅s del gestor para disparar la notificaci贸n
+            gestorLogin.LogOut();
+
+            string mensaje = GestorIdioma.GetInstance.TraducirMensaje("msg_CierreSesionExito", "Sesi贸n cerrada correctamente.");
+            string titulo = GestorIdioma.GetInstance.TraducirMensaje("msg_TituloCierreSesion", "Cerrar sesi贸n");
+
+            MessageBox.Show(mensaje, titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+
             LoginUI loginUI = new LoginUI();
             cargarFormulario(loginUI);
+
             foreach (ToolStripMenuItem item in menuStrip1.Items)
             {
                 item.Enabled = false;
             }
+
             mainUIStripMenuItemCerrarSesion.Enabled = false;
             mainUIStripMenuItemIniciarSesion.Enabled = true;
         }
@@ -117,6 +165,33 @@ namespace UI
         {
             BitacoraUI bitacoraUI = new BitacoraUI();
             cargarFormulario(bitacoraUI);
+        }
+
+        private void ComboIdiomasGlobal_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            if (comboIdiomasGlobal.SelectedItem == null) return;
+
+            BE.Idioma idiomaSeleccionado = (BE.Idioma)comboIdiomasGlobal.SelectedItem;
+
+            GestorIdioma.GetInstance.CambiarIdioma(idiomaSeleccionado.Codigo);
+        }
+
+        public void Update(Usuario usuarioInvolucrado, string action)
+        {
+            if (action.StartsWith("Idioma:"))
+            {
+                string codigoIdioma = action.Split(':')[1];
+
+                Dictionary<string, string> traducciones = GestorIdioma.GetInstance.ObtenerTraduccionesActuales(codigoIdioma);
+
+                TranslateServices.TraducirObjeto(this, traducciones);
+            }
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            GestorIdioma.GetInstance.Detach(this);
+            base.OnFormClosed(e);
         }
     }
 }

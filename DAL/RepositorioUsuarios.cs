@@ -62,10 +62,8 @@ namespace DAL
             }
             DataRow dr = foundRows[0];
             Guid parsedId = Guid.Parse(dr[0].ToString());
-            Usuario usuario = new Usuario(parsedId, (string)dr["Username"], (string)dr["PasswordHash"], (string)dr["Email"], (string)dr["NumTelefono"], (bool)dr["EstaBloqueado"]);
-
+            Usuario usuario = new Usuario(parsedId, (string)dr["Username"], (string)dr["PasswordHash"], (string)dr["Email"], (string)dr["NumTelefono"], (bool)dr["EstaBloqueado"], (string)dr["Idioma"], (int)dr["IntentosFallidos"]);
             CargarPermisosUsuario(usuario);
-
             return usuario;
         }
 
@@ -85,7 +83,7 @@ namespace DAL
             foreach (DataRow dr in table.Rows)
             {
                 Guid parsedId = Guid.Parse(dr[0].ToString());
-                Usuario usuario = new Usuario(parsedId, (string)dr["Username"], (string)dr["PasswordHash"], (string)dr["Email"], (string)dr["NumTelefono"], (bool)dr["EstaBloqueado"]);
+                Usuario usuario = new Usuario(parsedId, (string)dr["Username"], (string)dr["PasswordHash"], (string)dr["Email"], (string)dr["NumTelefono"], (bool)dr["EstaBloqueado"], (string)dr["Idioma"], (int)dr["IntentosFallidos"]);
                 CargarPermisosUsuario(usuario);
                 list_user.Add(usuario);
             }
@@ -118,6 +116,8 @@ namespace DAL
             newRow[3] = nUsuario.Email;
             newRow[4] = nUsuario.NumTelefono;
             newRow[5] = nUsuario.EstaBloqueado;
+            newRow[6] = nUsuario.Idioma;
+            newRow[7] = nUsuario.IntentosFallidos;
 
             dtUsuarios.Rows.Add(newRow);
             DAO.GetInstance.SubirCambiosBD();
@@ -154,6 +154,39 @@ namespace DAL
             DataRow filaUsuario = foundRows[0];
             filaUsuario.Delete();
             DAO.GetInstance.SubirCambiosBD();
+        }
+        public void CambiarEstadoBloqueo(string username, bool estaBloqueado)
+        {
+            DataSet ds = DAO.GetInstance.ObtenerDataSet();
+            DataTable dtUsuarios = ds.Tables["Usuario"];
+            DataRow[] foundRows = dtUsuarios.Select($"Username = '{username}'");
+
+            if (foundRows.Length > 0)
+            {
+                DataRow filaUsuario = foundRows[0];
+                filaUsuario["EstaBloqueado"] = estaBloqueado;
+
+                // Si el admin lo desbloquea, los fallos vuelven a 0
+                if (!estaBloqueado)
+                {
+                    filaUsuario["IntentosFallidos"] = 0;
+                }
+
+                DAO.GetInstance.SubirCambiosBD();
+            }
+        }
+
+        public void ActualizarIntentosFallidos(string username, int nuevosIntentos)
+        {
+            DataSet ds = DAO.GetInstance.ObtenerDataSet();
+            DataTable dtUsuarios = ds.Tables["Usuario"];
+            DataRow[] foundRows = dtUsuarios.Select($"Username = '{username}'");
+
+            if (foundRows.Length > 0)
+            {
+                foundRows[0]["IntentosFallidos"] = nuevosIntentos;
+                DAO.GetInstance.SubirCambiosBD();
+            }
         }
     }
 }

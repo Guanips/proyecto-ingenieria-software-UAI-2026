@@ -2,6 +2,6 @@
 {
     public interface IObserver
     {
-        public abstract void Update(string username, string action);
+        public void Update(string username, string action);
     }
 }

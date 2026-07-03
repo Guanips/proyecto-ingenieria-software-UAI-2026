@@ -18,6 +18,7 @@ namespace DAL
             if (tablaBitacora == null) throw new Exception("Tabla de bitacora no encontrada en el DataSet");
 
             List<Registro> _listRegistro = new List<Registro>();
+
             foreach (DataRow dr in tablaBitacora.Rows)
             {
                 _listRegistro.Add(new Registro((string)dr["Username"], (DateTime)dr["Fecha"], (string)dr["Accion"]));

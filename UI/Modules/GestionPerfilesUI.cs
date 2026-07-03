@@ -4,7 +4,7 @@ using servicios;
 
 namespace UI.Modules
 {
-    public partial class GestionPerfilesUI : Form
+    public partial class GestionPerfilesUI : FormBaseObserver
     {
         private GestorPerfiles gestorPerfiles;
 

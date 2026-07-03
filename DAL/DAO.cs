@@ -1,5 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using System.Data;
+using System.Text.Json;
+using System.IO;
 
 namespace DAL
 {
@@ -9,9 +11,8 @@ namespace DAL
         private static readonly object _lock = new object();
 
         private DataSet mainDataSet;
-        private SqlCommandBuilder cbUsers, cbBitacora, cbPermiso, cbPermisoRelacion, cbPerfilUsuario;
-        private SqlDataAdapter daUsers, daBitacora, daPermiso, daPermisoRelacion, daPerfilUsuario;
-
+        private SqlDataAdapter daUsers, daBitacora, daPermiso, daPermisoRelacion, daIdioma, daTraduccion, daPerfilUsuario;
+        private SqlCommandBuilder cbUsers, cbBitacora, cbPermiso, cbPermisoRelacion, cbIdioma, cbTraduccion, cbPerfilUsuario;
         private DAO()
         {
             string connectionString = ObtenerStringConexionEnv();
@@ -21,13 +22,25 @@ namespace DAL
             daBitacora = new SqlDataAdapter("Select * From Bitacora", connectionString);
             daPermiso = new SqlDataAdapter("Select * From Permiso", connectionString);
             daPermisoRelacion = new SqlDataAdapter("Select * From PermisoRelacion", connectionString);
+            daIdioma = new SqlDataAdapter("Select * From Idioma", connectionString);
+            daTraduccion = new SqlDataAdapter("Select * From Traduccion", connectionString);
             daPerfilUsuario = new SqlDataAdapter("Select * From PerfilUsuario", connectionString);
 
             daUsers.MissingSchemaAction = MissingSchemaAction.AddWithKey;
             daBitacora.MissingSchemaAction = MissingSchemaAction.AddWithKey;
             daPermiso.MissingSchemaAction = MissingSchemaAction.AddWithKey;
             daPermisoRelacion.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+            daIdioma.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+            daTraduccion.MissingSchemaAction = MissingSchemaAction.AddWithKey;
             daPerfilUsuario.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+
+            cbUsers = new SqlCommandBuilder(daUsers);
+            cbBitacora = new SqlCommandBuilder(daBitacora);
+            cbPermiso = new SqlCommandBuilder(daPermiso);
+            cbPermisoRelacion = new SqlCommandBuilder(daPermisoRelacion);
+            cbIdioma = new SqlCommandBuilder(daIdioma);
+            cbTraduccion = new SqlCommandBuilder(daTraduccion);
+            cbPerfilUsuario = new SqlCommandBuilder(daPerfilUsuario);
 
             mainDataSet = new DataSet("Users");
 
@@ -41,6 +54,8 @@ namespace DAL
                 CargarTablaConEsquema(daBitacora, "Bitacora", conn);
                 CargarTablaConEsquema(daPermiso, "Permiso", conn);
                 CargarTablaConEsquema(daPermisoRelacion, "PermisoRelacion", conn);
+                CargarTablaConEsquema(daIdioma, "Idioma", conn);
+                CargarTablaConEsquema(daTraduccion, "Traduccion", conn);
                 CargarTablaConEsquema(daPerfilUsuario, "PerfilUsuario", conn);
             }
 
@@ -131,44 +146,87 @@ namespace DAL
 
             mainDataSet.Relations.Add(drPermisoPadre);
             mainDataSet.Relations.Add(drPermisoHijo);
+
+            DataTable? dtIdioma = mainDataSet.Tables["Idioma"];
+            DataTable? dtTraduccion = mainDataSet.Tables["Traduccion"];
+
+            if (dtIdioma == null || dtTraduccion == null) throw new Exception("Error en el armado de relaciones DAO para Idiomas");
+
+            DataRelation drIdiomaTraduccion = new DataRelation(
+                "FK_Traduccion_Idioma",
+                dtIdioma.Columns["Codigo"]!,        // PK en Idioma
+                dtTraduccion.Columns["CodigoIdioma"]! // FK en Traduccion
+            );
+
+            mainDataSet.Relations.Add(drIdiomaTraduccion);
             mainDataSet.Relations.Add(drPerfilUsuarioUsuario);
             mainDataSet.Relations.Add(drPerfilUsuarioPerfil);
         }
 
         private void ConfigurarAutoincrementoGeneral()
         {
-            if (!mainDataSet.Tables.Contains("Bitacora") || !mainDataSet.Tables.Contains("Permiso")) return;
+            //if (!mainDataSet.Tables.Contains("Bitacora") || !mainDataSet.Tables.Contains("Permiso")) return;
 
-            DataTable dtBitacora = mainDataSet.Tables["Bitacora"]!;
-            DataTable dtPermiso = mainDataSet.Tables["Permiso"]!;
+            //DataTable dtBitacora = mainDataSet.Tables["Bitacora"]!;
+            //DataTable dtPermiso = mainDataSet.Tables["Permiso"]!;
 
-            if (!dtBitacora.Columns.Contains("ID") || !dtPermiso.Columns.Contains("ID")) return;
+            //if (!dtBitacora.Columns.Contains("ID") || !dtPermiso.Columns.Contains("ID")) return;
 
-            DataColumn columnaIdRegistroBitacora = dtBitacora.Columns["ID"]!;
-            int maxId = 0;
+            //DataColumn columnaIdRegistroBitacora = dtBitacora.Columns["ID"]!;
+            //int maxId = 0;
 
-            if (dtBitacora.Rows.Count > 0)
+            //if (dtBitacora.Rows.Count > 0)
+            //{
+            //    maxId = dtBitacora.AsEnumerable()
+            //        .Max(r => r["ID"] == DBNull.Value ? 0 : Convert.ToInt32(r["ID"]));
+            //}
+
+            //columnaIdRegistroBitacora.AutoIncrement = true;
+            //columnaIdRegistroBitacora.AutoIncrementSeed = maxId + 1;
+            //columnaIdRegistroBitacora.AutoIncrementStep = 1;
+
+            //DataColumn columnaIdRegistroPermiso = dtPermiso.Columns["ID"]!;
+            //int maxIdPermiso = 0;
+
+            //if (dtPermiso.Rows.Count > 0)
+            //{
+            //    maxIdPermiso = dtPermiso.AsEnumerable()
+            //        .Max(r => r["ID"] == DBNull.Value ? 0 : Convert.ToInt32(r["ID"]));
+            //}
+
+            //columnaIdRegistroPermiso.AutoIncrement = true;
+            //columnaIdRegistroPermiso.AutoIncrementSeed = maxIdPermiso + 1;
+            //columnaIdRegistroPermiso.AutoIncrementStep = 1;
+            if (mainDataSet.Tables.Contains("Bitacora") && mainDataSet.Tables["Bitacora"]!.Columns.Contains("ID"))
             {
-                maxId = dtBitacora.AsEnumerable()
-                    .Max(r => r["ID"] == DBNull.Value ? 0 : Convert.ToInt32(r["ID"]));
+                DataTable dtBitacora = mainDataSet.Tables["Bitacora"]!;
+                DataColumn columnaIdRegistroBitacora = dtBitacora.Columns["ID"]!;
+                int maxId = dtBitacora.Rows.Count > 0 ? dtBitacora.AsEnumerable().Max(r => r["ID"] == DBNull.Value ? 0 : Convert.ToInt32(r["ID"])) : 0;
+                columnaIdRegistroBitacora.AutoIncrement = true;
+                columnaIdRegistroBitacora.AutoIncrementSeed = maxId + 1;
+                columnaIdRegistroBitacora.AutoIncrementStep = 1;
             }
 
-            columnaIdRegistroBitacora.AutoIncrement = true;
-            columnaIdRegistroBitacora.AutoIncrementSeed = maxId + 1;
-            columnaIdRegistroBitacora.AutoIncrementStep = 1;
-
-            DataColumn columnaIdRegistroPermiso = dtPermiso.Columns["ID"]!;
-            int maxIdPermiso = 0;
-
-            if (dtPermiso.Rows.Count > 0)
+            if (mainDataSet.Tables.Contains("Permiso") && mainDataSet.Tables["Permiso"]!.Columns.Contains("ID"))
             {
-                maxIdPermiso = dtPermiso.AsEnumerable()
-                    .Max(r => r["ID"] == DBNull.Value ? 0 : Convert.ToInt32(r["ID"]));
+                DataTable dtPermiso = mainDataSet.Tables["Permiso"]!;
+                DataColumn columnaIdRegistroPermiso = dtPermiso.Columns["ID"]!;
+                int maxIdPermiso = dtPermiso.Rows.Count > 0 ? dtPermiso.AsEnumerable().Max(r => r["ID"] == DBNull.Value ? 0 : Convert.ToInt32(r["ID"])) : 0;
+                columnaIdRegistroPermiso.AutoIncrement = true;
+                columnaIdRegistroPermiso.AutoIncrementSeed = maxIdPermiso + 1;
+                columnaIdRegistroPermiso.AutoIncrementStep = 1;
             }
 
-            columnaIdRegistroPermiso.AutoIncrement = true;
-            columnaIdRegistroPermiso.AutoIncrementSeed = maxIdPermiso + 1;
-            columnaIdRegistroPermiso.AutoIncrementStep = 1;
+            // 4. Autoincremento para Traduccion (IdTraduccion)
+            if (mainDataSet.Tables.Contains("Traduccion") && mainDataSet.Tables["Traduccion"]!.Columns.Contains("IdTraduccion"))
+            {
+                DataTable dtTraduccion = mainDataSet.Tables["Traduccion"]!;
+                DataColumn colIdTrad = dtTraduccion.Columns["IdTraduccion"]!;
+                int maxIdTrad = dtTraduccion.Rows.Count > 0 ? dtTraduccion.AsEnumerable().Max(r => r["IdTraduccion"] == DBNull.Value ? 0 : Convert.ToInt32(r["IdTraduccion"])) : 0;
+                colIdTrad.AutoIncrement = true;
+                colIdTrad.AutoIncrementSeed = maxIdTrad + 1;
+                colIdTrad.AutoIncrementStep = 1;
+            }
         }
 
         public static DAO GetInstance
@@ -191,7 +249,7 @@ namespace DAL
 
         private string ObtenerStringConexionEnv()
         {
-            string? connectionString;
+            string? connectionString = null;
             string directorioActualDAO = AppContext.BaseDirectory;
             DirectoryInfo? directorioRaiz = new DirectoryInfo(directorioActualDAO);
 
@@ -201,11 +259,76 @@ namespace DAL
             }
 
             if (directorioRaiz == null) throw new Exception("Raiz del proyecto no encontrada para cargar archivo de configuración");
-            string rutaArchivoEnv = Path.Combine(directorioRaiz.FullName, ".env");
 
-            DotNetEnv.Env.Load(rutaArchivoEnv);
-            connectionString = Environment.GetEnvironmentVariable("SQL_SERVER_CONNECTION_STRING");
-            if (connectionString == null) throw new Exception("Configuración para conexión no encontrada");
+            // 1) Intentar cargar .env si existe
+            string rutaArchivoEnv = Path.Combine(directorioRaiz.FullName, ".env");
+            if (File.Exists(rutaArchivoEnv))
+            {
+                try
+                {
+                    DotNetEnv.Env.Load(rutaArchivoEnv);
+                }
+                catch
+                {
+                    // Ignore .env parse errors and continue to other sources
+                }
+            }
+
+            // 2) Variables de entorno conocidas
+            connectionString = Environment.GetEnvironmentVariable("SQL_SERVER_CONNECTION_STRING")
+                ?? Environment.GetEnvironmentVariable("ConnectionStrings__Default")
+                ?? Environment.GetEnvironmentVariable("ConnectionStrings:Default")
+                ?? Environment.GetEnvironmentVariable("DefaultConnection");
+
+            // 3) appsettings.json fallback
+            if (connectionString == null)
+            {
+                string rutaAppSettings = Path.Combine(directorioRaiz.FullName, "appsettings.json");
+                if (File.Exists(rutaAppSettings))
+                {
+                    try
+                    {
+                        string json = File.ReadAllText(rutaAppSettings);
+                        using JsonDocument doc = JsonDocument.Parse(json);
+                        JsonElement root = doc.RootElement;
+
+                        if (root.TryGetProperty("ConnectionStrings", out JsonElement cs))
+                        {
+                            if (cs.TryGetProperty("Default", out JsonElement def) && def.ValueKind == JsonValueKind.String)
+                            {
+                                connectionString = def.GetString();
+                            }
+                            else if (cs.TryGetProperty("SQL_SERVER_CONNECTION_STRING", out JsonElement ss) && ss.ValueKind == JsonValueKind.String)
+                            {
+                                connectionString = ss.GetString();
+                            }
+                            else
+                            {
+                                foreach (JsonProperty prop in cs.EnumerateObject())
+                                {
+                                    if (prop.Value.ValueKind == JsonValueKind.String)
+                                    {
+                                        connectionString = prop.Value.GetString();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        else if (root.TryGetProperty("SQL_SERVER_CONNECTION_STRING", out JsonElement top) && top.ValueKind == JsonValueKind.String)
+                        {
+                            connectionString = top.GetString();
+                        }
+                    }
+                    catch
+                    {
+                        // Ignore parsing errors and continue
+                    }
+                }
+            }
+
+            if (connectionString == null) 
+                throw new Exception("Configuración para conexión no encontrada. Se buscó en: .env (SQL_SERVER_CONNECTION_STRING), variables de entorno (ConnectionStrings__Default, ConnectionStrings:Default, DefaultConnection) y appsettings.json");
+
             return connectionString;
         }
 
@@ -226,6 +349,8 @@ namespace DAL
                 daBitacora.SelectCommand.Connection = conn;
                 daPermiso.SelectCommand.Connection = conn;
                 daPermisoRelacion.SelectCommand.Connection = conn;
+                daIdioma.SelectCommand.Connection = conn;
+                daTraduccion.SelectCommand.Connection = conn;
                 daPerfilUsuario.SelectCommand.Connection = conn;
 
                 daUsers.InsertCommand = cbUsers.GetInsertCommand();
@@ -256,6 +381,19 @@ namespace DAL
                 daPermisoRelacion.UpdateCommand.Connection = conn;
                 daPermisoRelacion.DeleteCommand.Connection = conn;
 
+                daIdioma.InsertCommand = cbIdioma.GetInsertCommand();
+                daIdioma.UpdateCommand = cbIdioma.GetUpdateCommand();
+                daIdioma.DeleteCommand = cbIdioma.GetDeleteCommand();
+                daIdioma.InsertCommand.Connection = conn;
+                daIdioma.UpdateCommand.Connection = conn;
+                daIdioma.DeleteCommand.Connection = conn;
+
+                daTraduccion.InsertCommand = cbTraduccion.GetInsertCommand();
+                daTraduccion.UpdateCommand = cbTraduccion.GetUpdateCommand();
+                daTraduccion.DeleteCommand = cbTraduccion.GetDeleteCommand();
+                daTraduccion.InsertCommand.Connection = conn;
+                daTraduccion.UpdateCommand.Connection = conn;
+                daTraduccion.DeleteCommand.Connection = conn;
                 daPerfilUsuario.InsertCommand = cbPerfilUsuario.GetInsertCommand();
                 daPerfilUsuario.UpdateCommand = cbPerfilUsuario.GetUpdateCommand();
                 daPerfilUsuario.DeleteCommand = cbPerfilUsuario.GetDeleteCommand();
@@ -267,10 +405,13 @@ namespace DAL
                 daBitacora.Update(mainDataSet, "Bitacora");
                 daPermiso.Update(mainDataSet, "Permiso");
                 daPermisoRelacion.Update(mainDataSet, "PermisoRelacion");
+                daIdioma.Update(mainDataSet, "Idioma");
+                daTraduccion.Update(mainDataSet, "Traduccion");
                 daPerfilUsuario.Update(mainDataSet, "PerfilUsuario");
 
                 mainDataSet.AcceptChanges();
             }
         }
+
     }
 }
