@@ -1,3 +1,4 @@
+using BE;
 using BLL;
 using UI.Login;
 using UI.Modules;
@@ -12,6 +13,10 @@ namespace UI
         {
             InitializeComponent();
             this.IsMdiContainer = true;
+            foreach (ToolStripMenuItem item in menuStrip1.Items)
+            {
+                item.Enabled = false;
+            }
         }
 
         private void cargarFormulario(Form formulario)
@@ -34,9 +39,31 @@ namespace UI
 
         private void LoginUI_SesionIniciada(object? sender, EventArgs e)
         {
-            mainUIStripMenuItemCerrarSesion.Enabled = true;
-            mainUIStripMenuItemIniciarSesion.Enabled = false;
-            formCargadoActualmente?.Close();
+            try
+            {
+                mainUIStripMenuItemInicio.Enabled = true;
+                mainUIStripMenuItemCerrarSesion.Enabled = true;
+                mainUIStripMenuItemIniciarSesion.Enabled = false;
+
+                Usuario? usuarioActual = SessionManager.getInstance.ObtenerUsuarioActivo();
+
+                if (usuarioActual != null)
+                {
+                    mainUIStripMenuItemGestionDeUsuarios.Enabled = usuarioActual.Permisos.Any(p => p.ValidarPermiso("PERM-GESTIONAR-USR"));
+                    mainUIStripMenuItemGestionDePerfiles.Enabled = usuarioActual.Permisos.Any(p => p.ValidarPermiso("PERM-GESTIONAR-PERFIL"));
+                    mainUIStripMenuItemBitacora.Enabled = usuarioActual.Permisos.Any(p => p.ValidarPermiso("PERM-CONSULTA-BIT"));
+                }
+                else
+                {
+                    throw new Exception("Login error");
+                }
+
+                formCargadoActualmente?.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -60,6 +87,10 @@ namespace UI
             MessageBox.Show("Sesión cerrada correctamente.", "Cerrar sesión", MessageBoxButtons.OK, MessageBoxIcon.Information);
             LoginUI loginUI = new LoginUI();
             cargarFormulario(loginUI);
+            foreach (ToolStripMenuItem item in menuStrip1.Items)
+            {
+                item.Enabled = false;
+            }
             mainUIStripMenuItemCerrarSesion.Enabled = false;
             mainUIStripMenuItemIniciarSesion.Enabled = true;
         }

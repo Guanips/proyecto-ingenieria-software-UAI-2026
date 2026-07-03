@@ -7,6 +7,7 @@
         public string NumTelefono { get; private set; }
         public string Email { get; private set; }
         public bool EstaBloqueado { get; private set; }
+        public List<Permiso> Permisos { get; private set; }
 
         public Usuario(Guid id, string nUsername, string nPasswordHash, string nEmail, string nNumTelefono, bool estaBloqueado)
         {
@@ -16,6 +17,7 @@
             Email = nEmail;
             NumTelefono = nNumTelefono;
             EstaBloqueado = estaBloqueado;
+            Permisos = new List<Permiso>();
         }
     }
 

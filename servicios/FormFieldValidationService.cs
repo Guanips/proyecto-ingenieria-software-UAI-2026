@@ -12,6 +12,7 @@ namespace servicios
         private static readonly Regex OnlyLettersRegex = new Regex(@"^[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ ]+$", RegexOptions.Compiled);
         private static readonly Regex AlphaNumericStrictRegex = new Regex(@"^[a-zA-Z0-9]+$", RegexOptions.Compiled);
         private static readonly Regex AlphaNumericWithSpacesRegex = new Regex(@"^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚüÜ ]+$", RegexOptions.Compiled);
+        private static readonly Regex ProfileNameRegex = new Regex(@"^PERF-[^\s]+$", RegexOptions.Compiled);
 
         public static ValidationResult ValidateUsername(string username)
         {
@@ -65,6 +66,15 @@ namespace servicios
             bool isValid = AlphaNumericWithSpacesRegex.IsMatch(text.Trim());
             if (isValid) return new ValidationResult(true);
             return new ValidationResult(false, "El campo solo puede contener letras, números y espacios (sin caracteres especiales)");
+        }
+
+        public static ValidationResult ValidateProfileName(string profileName)
+        {
+            if (string.IsNullOrWhiteSpace(profileName)) return new ValidationResult(false, "El nombre del perfil no puede estar vacío");
+
+            bool isValid = ProfileNameRegex.IsMatch(profileName.Trim());
+            if (isValid) return new ValidationResult(true);
+            return new ValidationResult(false, "El nombre del perfil debe comenzar con 'PERF-' seguido de caracteres (sin espacios)");
         }
     }
 }

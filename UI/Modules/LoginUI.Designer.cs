@@ -66,6 +66,7 @@
             textBoxContrasena.Name = "textBoxContrasena";
             textBoxContrasena.Size = new Size(209, 23);
             textBoxContrasena.TabIndex = 3;
+            textBoxContrasena.UseSystemPasswordChar = true;
             // 
             // loginUIButtonIniciarSesion
             // 
