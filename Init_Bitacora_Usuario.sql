@@ -4,7 +4,9 @@ CREATE TABLE Usuario (
 	PasswordHash NVARCHAR(100) NOT NULL,
 	Email NVARCHAR(100) NOT NULL,
 	NumTelefono NVARCHAR(20) NOT NULL,
-	EstaBloqueado BIT NOT NULL
+	EstaBloqueado BIT NOT NULL,
+	Idioma NVARCHAR(20) NOT NULL,
+	IntentosFallidos INT NOT NULL DEFAULT 0
 );
 
 CREATE TABLE Bitacora (
@@ -37,12 +39,32 @@ CREATE TABLE PerfilUsuario (
 	CONSTRAINT FK_PerfilUsuarioPerfil FOREIGN KEY (ID_Perfil) REFERENCES Permiso(ID)
 );
 
+CREATE TABLE Idioma (
+    Codigo VARCHAR(5) NOT NULL,   -- Ej: 'ES', 'EN'
+    Nombre VARCHAR(50) NOT NULL,  -- Ej: 'Español', 'English'
+    CONSTRAINT PK_Idioma PRIMARY KEY (Codigo)
+);
+
+CREATE TABLE Traduccion (
+    IdTraduccion INT IDENTITY(1,1) NOT NULL,
+    CodigoIdioma VARCHAR(5) NOT NULL,
+    KeyEtiqueta VARCHAR(100) NOT NULL, -- El nombre del control (Ej: loginUILabelUsername)
+    Texto NVARCHAR(MAX) NOT NULL,      -- El texto a mostrar (Ej: 'Nombre de usuario')
+    CONSTRAINT PK_Traduccion PRIMARY KEY (IdTraduccion),
+    CONSTRAINT FK_Traduccion_Idioma FOREIGN KEY (CodigoIdioma) REFERENCES Idioma(Codigo)
+);
+
+CREATE UNIQUE INDEX UIX_Idioma_Etiqueta ON Traduccion(CodigoIdioma, KeyEtiqueta);
+
+
 INSERT INTO Usuario VALUES (
 	'd1eda407-3582-4e0c-85cc-ae51eb67b826',
 	'admin',
 	'8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918',
 	'admin@gmail.com',
 	'+54 1120202020',
+	0,
+	'ES',
 	0
 );
 
