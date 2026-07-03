@@ -6,9 +6,12 @@ namespace BLL
 {
     public class GestorLogin : ISujeto
     {
-        private List<IObserver> ObserversAttached = new List<IObserver>();
-        public GestorLogin() { Attach(new GestorBitacora()); }
+        public GestorLogin()
+        {
+            Attach(GestorBitacora.GetInstance);
+        }
 
+        private List<IObserver> ObserversAttached = new List<IObserver>();
 
         public void Attach(IObserver observer)
         {
@@ -20,11 +23,11 @@ namespace BLL
             ObserversAttached.Remove(observer);
         }
 
-        public void Notificar(Usuario usuarioInvolucrado, string accion)
+        public void Notificar(string username, string accion)
         {
             foreach (IObserver item in ObserversAttached)
             {
-                item.Update(usuarioInvolucrado, accion);
+                item.Update(username, accion);
             }
         }
 
@@ -40,11 +43,11 @@ namespace BLL
             if (_user.EstaBloqueado)
             {
                 string msg = GestorIdioma.GetInstance.TraducirMensaje("err_UsuarioBloqueado", "El usuario se encuentra bloqueado. Contacte a un administrador para recuperar el acceso.");
+                Notificar(_user.Username, "LOG_BLOQUEO");
                 throw new Exception(msg);
             }
             string hash = CryptoService.EncriptarPassword(pass);
 
-            
             if (!CryptoService.Comparer(hash, _user.PasswordHash))
             {
                 int nuevosIntentos = _user.IntentosFallidos + 1;
@@ -54,6 +57,7 @@ namespace BLL
                 {
                     RepoUsuarios.CambiarEstadoBloqueo(usuario, true);
                     string msgBloqueo = GestorIdioma.GetInstance.TraducirMensaje("err_MaxIntentos", "Ha superado los 3 intentos fallidos. Su cuenta ha sido bloqueada por seguridad.");
+                    Notificar(_user.Username, "LOG_USUARIO_BLOQUEADO");
                     throw new Exception(msgBloqueo);
                 }
 
@@ -67,9 +71,9 @@ namespace BLL
             }
 
             string logInicio = GestorIdioma.GetInstance.TraducirMensaje("log_InicioSesion", "Inicio De Sesion");
-            
+
             SessionManager.getInstance.LogIn(_user);
-            Notificar(_user, "LOG_LOGIN");
+            Notificar(_user.Username, "LOG_LOGIN");
         }
 
         public void LogOut()
@@ -82,8 +86,8 @@ namespace BLL
             }
 
             string logCierre = GestorIdioma.GetInstance.TraducirMensaje("log_CierreSesion", "Cierre de Sesion");
-            
-            Notificar(usuarioActivo, "LOG_LOGOUT");
+
+            Notificar(usuarioActivo.Username, "LOG_LOGOUT");
             SessionManager.getInstance.LogOut();
         }
 

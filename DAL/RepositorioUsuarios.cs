@@ -62,7 +62,7 @@ namespace DAL
             }
             DataRow dr = foundRows[0];
             Guid parsedId = Guid.Parse(dr[0].ToString());
-            Usuario usuario = new Usuario(parsedId, (string)dr[1], (string)dr[2], (string)dr[3], (string)dr[4], (bool)dr[5], (string)dr[6], (int)dr[7]);
+            Usuario usuario = new Usuario(parsedId, (string)dr["Username"], (string)dr["PasswordHash"], (string)dr["Email"], (string)dr["NumTelefono"], (bool)dr["EstaBloqueado"], (string)dr["Idioma"], (int)dr["IntentosFallidos"]);
             CargarPermisosUsuario(usuario);
             return usuario;
         }
@@ -83,7 +83,7 @@ namespace DAL
             foreach (DataRow dr in table.Rows)
             {
                 Guid parsedId = Guid.Parse(dr[0].ToString());
-                Usuario usuario = new Usuario(parsedId, (string)dr[1], (string)dr[2], (string)dr[3], (string)dr[4], (bool)dr[5], (string)dr[6], (int)dr[7]);
+                Usuario usuario = new Usuario(parsedId, (string)dr["Username"], (string)dr["PasswordHash"], (string)dr["Email"], (string)dr["NumTelefono"], (bool)dr["EstaBloqueado"], (string)dr["Idioma"], (int)dr["IntentosFallidos"]);
                 CargarPermisosUsuario(usuario);
                 list_user.Add(usuario);
             }

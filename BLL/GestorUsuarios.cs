@@ -8,7 +8,10 @@ namespace BLL
     {
         private List<IObserver> ObserversAttached = new List<IObserver>();
 
-        public GestorUsuarios() { Attach(new GestorBitacora()); }
+        public GestorUsuarios()
+        {
+            Attach(GestorBitacora.GetInstance);
+        }
 
         public void Attach(IObserver observer)
         {
@@ -22,11 +25,11 @@ namespace BLL
             ObserversAttached.Remove(observer);
         }
 
-        public void Notificar(Usuario usuarioInvolucrado, string action)
+        public void Notificar(string username, string action)
         {
             foreach (IObserver item in ObserversAttached)
             {
-                item.Update(usuarioInvolucrado, action);
+                item.Update(username, action);
             }
         }
 
@@ -45,17 +48,13 @@ namespace BLL
 
             Usuario nuevoUsuario = new Usuario(Guid.NewGuid(), nUsername, passwordHash, nEmail, nNumTelefono, false, nIdioma, 0);
             RepositorioUsuarios.GetInstance.AgregarUsuario(nuevoUsuario);
-
-            Usuario? activo = SessionManager.getInstance.ObtenerUsuarioActivo();
-            if (activo != null) Notificar(activo, "LOG_USER_ADD");
-
+            Notificar(SessionManager.getInstance.ObtenerUsuarioActivo()!.Username, "LOG_USER_ADD");
         }
 
         public void EliminarUsuario(string nUsername)
         {
             RepositorioUsuarios.GetInstance.EliminarUsuario(nUsername);
-            Usuario? activo = SessionManager.getInstance.ObtenerUsuarioActivo();
-            if (activo != null) Notificar(activo, "LOG_USER_DEL");
+            Notificar(SessionManager.getInstance.ObtenerUsuarioActivo()!.Username, "LOG_USER_DEL");
         }
 
         public void ModificarUsuario(string nUsername, string nEmail, string nNumTelefono)
@@ -63,9 +62,7 @@ namespace BLL
             Usuario usuarioObtenido = RepositorioUsuarios.GetInstance.ObtenerUsuario(nUsername);
             Usuario usuarioModificado = new Usuario(usuarioObtenido.Id, nUsername, usuarioObtenido.PasswordHash, nEmail, nNumTelefono, usuarioObtenido.EstaBloqueado, usuarioObtenido.Idioma, usuarioObtenido.IntentosFallidos);
             RepositorioUsuarios.GetInstance.ModificarUsuario(usuarioModificado);
-
-            Usuario? activo = SessionManager.getInstance.ObtenerUsuarioActivo();
-            if (activo != null) Notificar(activo, "LOG_USER_MOD");
+            Notificar(SessionManager.getInstance.ObtenerUsuarioActivo()!.Username, "LOG_USER_MOD");
         }
     }
 }

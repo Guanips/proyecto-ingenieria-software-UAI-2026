@@ -4,6 +4,6 @@
     {
         public void Attach(IObserver observer);
         public void Detach(IObserver observer);
-        public void Notificar(Usuario usuarioInvolucrado, string accion);
+        public void Notificar(string username, string accion);
     }
 }
