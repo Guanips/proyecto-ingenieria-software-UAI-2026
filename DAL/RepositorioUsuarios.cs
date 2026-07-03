@@ -18,6 +18,34 @@ namespace DAL
             }
         }
 
+        private void CargarPermisosUsuario(Usuario usuario)
+        {
+            DAO dao = DAO.GetInstance;
+            DataSet ds = dao.ObtenerDataSet();
+            DataTable? dtPerfilUsuario = ds.Tables["PerfilUsuario"];
+
+            if (dtPerfilUsuario == null)
+            {
+                return;
+            }
+
+            RepositorioPerfiles repoPerfiles = new RepositorioPerfiles();
+            List<Permiso> permisosDisponibles = repoPerfiles.ObtenerPermisos();
+
+            DataRow[] filasUsuario = dtPerfilUsuario.Select($"ID_Usuario = '{usuario.Id}'");
+
+            foreach (DataRow fila in filasUsuario)
+            {
+                uint idPermiso = Convert.ToUInt32(fila["ID_Perfil"]);
+                Permiso? permisoEncontrado = permisosDisponibles.FirstOrDefault(p => p.ID == idPermiso);
+
+                if (permisoEncontrado != null)
+                {
+                    usuario.Permisos.Add(permisoEncontrado);
+                }
+            }
+        }
+
         public Usuario ObtenerUsuario(string username)
         {
             DAO dao = DAO.GetInstance;
@@ -34,7 +62,9 @@ namespace DAL
             }
             DataRow dr = foundRows[0];
             Guid parsedId = Guid.Parse(dr[0].ToString());
-            return new Usuario(parsedId, (string)dr[1], (string)dr[2], (string)dr[3], (string)dr[4], (bool)dr[5], (string)dr[6], (int)dr[7]);
+            Usuario usuario = new Usuario(parsedId, (string)dr[1], (string)dr[2], (string)dr[3], (string)dr[4], (bool)dr[5], (string)dr[6], (int)dr[7]);
+            CargarPermisosUsuario(usuario);
+            return usuario;
         }
 
         public List<Usuario> ObtenerListadoTotalUsuarios()
@@ -53,7 +83,9 @@ namespace DAL
             foreach (DataRow dr in table.Rows)
             {
                 Guid parsedId = Guid.Parse(dr[0].ToString());
-                list_user.Add(new Usuario(parsedId, (string)dr[1], (string)dr[2], (string)dr[3], (string)dr[4], (bool)dr[5], (string)dr[6], (int)dr[7]));
+                Usuario usuario = new Usuario(parsedId, (string)dr[1], (string)dr[2], (string)dr[3], (string)dr[4], (bool)dr[5], (string)dr[6], (int)dr[7]);
+                CargarPermisosUsuario(usuario);
+                list_user.Add(usuario);
             }
 
             return list_user;

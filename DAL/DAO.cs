@@ -9,18 +9,20 @@ namespace DAL
         private static readonly object _lock = new object();
 
         private DataSet mainDataSet;
-        private SqlDataAdapter daUsers, daBitacora, daPermiso, daPermisoRelacion, daIdioma, daTraduccion;
-        private SqlCommandBuilder cbUsers, cbBitacora, cbPermiso, cbPermisoRelacion, cbIdioma, cbTraduccion;
+        private SqlDataAdapter daUsers, daBitacora, daPermiso, daPermisoRelacion, daIdioma, daTraduccion, daPerfilUsuario;
+        private SqlCommandBuilder cbUsers, cbBitacora, cbPermiso, cbPermisoRelacion, cbIdioma, cbTraduccion, cbPerfilUsuario;
         private DAO()
         {
             string connectionString = ObtenerStringConexionEnv();
 
+            // 1. Instanciar los DataAdapters con sus consultas base
             daUsers = new SqlDataAdapter("Select * From Usuario", connectionString);
             daBitacora = new SqlDataAdapter("Select * From Bitacora", connectionString);
             daPermiso = new SqlDataAdapter("Select * From Permiso", connectionString);
             daPermisoRelacion = new SqlDataAdapter("Select * From PermisoRelacion", connectionString);
             daIdioma = new SqlDataAdapter("Select * From Idioma", connectionString);
             daTraduccion = new SqlDataAdapter("Select * From Traduccion", connectionString);
+            daPerfilUsuario = new SqlDataAdapter("Select * From PerfilUsuario", connectionString);
 
             daUsers.MissingSchemaAction = MissingSchemaAction.AddWithKey;
             daBitacora.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -28,6 +30,7 @@ namespace DAL
             daPermisoRelacion.MissingSchemaAction = MissingSchemaAction.AddWithKey;
             daIdioma.MissingSchemaAction = MissingSchemaAction.AddWithKey;
             daTraduccion.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+            daPerfilUsuario.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
             cbUsers = new SqlCommandBuilder(daUsers);
             cbBitacora = new SqlCommandBuilder(daBitacora);
@@ -35,9 +38,11 @@ namespace DAL
             cbPermisoRelacion = new SqlCommandBuilder(daPermisoRelacion);
             cbIdioma = new SqlCommandBuilder(daIdioma);
             cbTraduccion = new SqlCommandBuilder(daTraduccion);
+            cbPerfilUsuario = new SqlCommandBuilder(daPerfilUsuario);
 
             mainDataSet = new DataSet("Users");
 
+            // 2. Abrir la conexión y CARGAR los datos PRIMERO
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
@@ -49,7 +54,15 @@ namespace DAL
                 CargarTablaConEsquema(daPermisoRelacion, "PermisoRelacion", conn);
                 CargarTablaConEsquema(daIdioma, "Idioma", conn);
                 CargarTablaConEsquema(daTraduccion, "Traduccion", conn);
+                CargarTablaConEsquema(daPerfilUsuario, "PerfilUsuario", conn);
             }
+
+            // 3. INSTANCIAR los CommandBuilders DESPUÉS de que las tablas tengan su esquema y PK cargados
+            cbUsers = new SqlCommandBuilder(daUsers);
+            cbBitacora = new SqlCommandBuilder(daBitacora);
+            cbPermiso = new SqlCommandBuilder(daPermiso);
+            cbPermisoRelacion = new SqlCommandBuilder(daPermisoRelacion);
+            cbPerfilUsuario = new SqlCommandBuilder(daPerfilUsuario);
 
             ConfigurarAutoincrementoGeneral();
             ArmarRelaciones();
@@ -65,16 +78,45 @@ namespace DAL
             adapter.SelectCommand.CommandText = $"Select * From {tableName}";
             adapter.SelectCommand.Connection = connection;
 
+            // Llenamos el esquema y los datos
             adapter.FillSchema(mainDataSet, SchemaType.Source, tableName);
             adapter.Fill(mainDataSet, tableName);
+
+            // DOBLE CHECK: Si por alguna razón el proveedor de SQL Server no mapeó la PK, la forzamos basándonos en la BD
+            if (mainDataSet.Tables[tableName]!.PrimaryKey.Length == 0)
+            {
+                // Esto le avisa al CommandBuilder de forma explícita cuál es la columna clave
+                // En tus tablas es 'ID', salvo en las compuestas como PermisoRelacion que usa ambas
+                if (tableName == "PermisoRelacion")
+                {
+                    mainDataSet.Tables[tableName]!.PrimaryKey = new DataColumn[] {
+                mainDataSet.Tables[tableName]!.Columns["ID_Padre"]!,
+                mainDataSet.Tables[tableName]!.Columns["ID_Hijo"]!
+            };
+                }
+                else if (tableName == "PerfilUsuario")
+                {
+                    // PerfilUsuario no tiene PK explícita en tu script (solo FKs), podrías asignarle una compuesta si la requiere:
+                    mainDataSet.Tables[tableName]!.PrimaryKey = new DataColumn[] {
+                mainDataSet.Tables[tableName]!.Columns["ID_Usuario"]!,
+                mainDataSet.Tables[tableName]!.Columns["ID_Perfil"]!
+            };
+                }
+                else
+                {
+                    mainDataSet.Tables[tableName]!.PrimaryKey = new DataColumn[] { mainDataSet.Tables[tableName]!.Columns["ID"]! };
+                }
+            }
         }
 
         private void ArmarRelaciones()
         {
             DataTable? dtPermiso = mainDataSet.Tables["Permiso"];
             DataTable? dtPermisoRelacion = mainDataSet.Tables["PermisoRelacion"];
+            DataTable? dtPerfilUsuario = mainDataSet.Tables["PerfilUsuario"];
+            DataTable? dtUsuario = mainDataSet.Tables["Usuario"];
 
-            if (dtPermiso == null || dtPermisoRelacion == null) throw new Exception("Error en el armado de relaciones DAO");
+            if (dtPermiso == null || dtPermisoRelacion == null || dtPerfilUsuario == null || dtUsuario == null) throw new Exception("Error en el armado de relaciones DAO");
 
             DataRelation drPermisoPadre = new DataRelation(
                 "FK_PermisoRelacion_Padre",
@@ -86,6 +128,18 @@ namespace DAL
                 "FK_PermisoRelacion_Hijo",
                 dtPermiso.Columns["ID"]!,
                 dtPermisoRelacion.Columns["ID_Hijo"]!
+            );
+
+            DataRelation drPerfilUsuarioUsuario = new DataRelation(
+                "FK_PerfilUsuarioUsuario",
+                dtUsuario.Columns["ID"]!,
+                dtPerfilUsuario.Columns["ID_Usuario"]!
+            );
+
+            DataRelation drPerfilUsuarioPerfil = new DataRelation(
+                "FK_PerfilUsuarioPerfil",
+                dtPermiso.Columns["ID"]!,
+                dtPerfilUsuario.Columns["ID_Perfil"]!
             );
 
             mainDataSet.Relations.Add(drPermisoPadre);
@@ -103,6 +157,8 @@ namespace DAL
             );
 
             mainDataSet.Relations.Add(drIdiomaTraduccion);
+            mainDataSet.Relations.Add(drPerfilUsuarioUsuario);
+            mainDataSet.Relations.Add(drPerfilUsuarioPerfil);
         }
 
         private void ConfigurarAutoincrementoGeneral()
@@ -228,6 +284,7 @@ namespace DAL
                 daPermisoRelacion.SelectCommand.Connection = conn;
                 daIdioma.SelectCommand.Connection = conn;
                 daTraduccion.SelectCommand.Connection = conn;
+                daPerfilUsuario.SelectCommand.Connection = conn;
 
                 daUsers.InsertCommand = cbUsers.GetInsertCommand();
                 daUsers.UpdateCommand = cbUsers.GetUpdateCommand();
@@ -270,6 +327,12 @@ namespace DAL
                 daTraduccion.InsertCommand.Connection = conn;
                 daTraduccion.UpdateCommand.Connection = conn;
                 daTraduccion.DeleteCommand.Connection = conn;
+                daPerfilUsuario.InsertCommand = cbPerfilUsuario.GetInsertCommand();
+                daPerfilUsuario.UpdateCommand = cbPerfilUsuario.GetUpdateCommand();
+                daPerfilUsuario.DeleteCommand = cbPerfilUsuario.GetDeleteCommand();
+                daPerfilUsuario.InsertCommand.Connection = conn;
+                daPerfilUsuario.UpdateCommand.Connection = conn;
+                daPerfilUsuario.DeleteCommand.Connection = conn;
 
                 daUsers.Update(mainDataSet, "Usuario");
                 daBitacora.Update(mainDataSet, "Bitacora");
@@ -277,10 +340,11 @@ namespace DAL
                 daPermisoRelacion.Update(mainDataSet, "PermisoRelacion");
                 daIdioma.Update(mainDataSet, "Idioma");
                 daTraduccion.Update(mainDataSet, "Traduccion");
+                daPerfilUsuario.Update(mainDataSet, "PerfilUsuario");
 
                 mainDataSet.AcceptChanges();
             }
         }
-        
+
     }
 }

@@ -62,7 +62,7 @@
             perfilesUIGroupBoxTreeView.Size = new Size(297, 436);
             perfilesUIGroupBoxTreeView.TabIndex = 0;
             perfilesUIGroupBoxTreeView.TabStop = false;
-            perfilesUIGroupBoxTreeView.Text = "Arbol de perfiles y permisos";
+            perfilesUIGroupBoxTreeView.Text = "Arbol de perfiles";
             // 
             // perfilesUIButtonCrearPerfil
             // 
@@ -179,6 +179,7 @@
             dataGridViewUsuarios.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridViewUsuarios.Size = new Size(268, 347);
             dataGridViewUsuarios.TabIndex = 0;
+            dataGridViewUsuarios.SelectionChanged += dataGridViewUsuarios_SelectionChanged;
             // 
             // perfilesUIGroupBoxListBoxPermisos
             // 
@@ -224,6 +225,7 @@
             Name = "GestionPerfilesUI";
             Text = "GestionPerfilesUI";
             WindowState = FormWindowState.Maximized;
+            Load += GestionPerfilesUI_Load;
             perfilesUIGroupBoxTreeView.ResumeLayout(false);
             perfilesUIGroupBoxTreeView.PerformLayout();
             perfilesUIGroupBoxListBoxPerfiles.ResumeLayout(false);
