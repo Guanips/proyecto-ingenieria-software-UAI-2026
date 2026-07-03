@@ -36,14 +36,14 @@ namespace BLL
             return repositorioUsuarios.ObtenerListadoTotalUsuarios();
         }
 
-        public void RegistrarUsuario(string nUsername, string nPassword, string nEmail, string nNumTelefono)
+        public void RegistrarUsuario(string nUsername, string nPassword, string nEmail, string nNumTelefono, string nIdioma)
         {
             bool usuarioExiste = RepositorioUsuarios.GetInstance.VerificarExistenciaDeUsername(nUsername);
             if (usuarioExiste) throw new Exception("El usuario ya existe");
 
             string passwordHash = CryptoService.EncriptarPassword(nPassword);
 
-            Usuario nuevoUsuario = new Usuario(Guid.NewGuid(), nUsername, passwordHash, nEmail, nNumTelefono, false);
+            Usuario nuevoUsuario = new Usuario(Guid.NewGuid(), nUsername, passwordHash, nEmail, nNumTelefono, false, nIdioma, 0);
             RepositorioUsuarios.GetInstance.AgregarUsuario(nuevoUsuario);
         }
 
@@ -55,7 +55,7 @@ namespace BLL
         public void ModificarUsuario(string nUsername, string nEmail, string nNumTelefono)
         {
             Usuario usuarioObtenido = RepositorioUsuarios.GetInstance.ObtenerUsuario(nUsername);
-            Usuario usuarioModificado = new Usuario(usuarioObtenido.Id, nUsername, usuarioObtenido.PasswordHash, nEmail, nNumTelefono, usuarioObtenido.EstaBloqueado);
+            Usuario usuarioModificado = new Usuario(usuarioObtenido.Id, nUsername, usuarioObtenido.PasswordHash, nEmail, nNumTelefono, usuarioObtenido.EstaBloqueado, usuarioObtenido.Idioma, usuarioObtenido.IntentosFallidos);
             RepositorioUsuarios.GetInstance.ModificarUsuario(usuarioModificado);
         }
     }

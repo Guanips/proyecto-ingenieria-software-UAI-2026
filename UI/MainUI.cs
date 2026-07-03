@@ -1,10 +1,12 @@
+ï»¿using BE;
 using BLL;
+using servicios;
 using UI.Login;
 using UI.Modules;
 
 namespace UI
 {
-    public partial class MainUI : Form
+    public partial class MainUI : Form,IObserver
     {
         private Form? formCargadoActualmente;
 
@@ -12,6 +14,7 @@ namespace UI
         {
             InitializeComponent();
             this.IsMdiContainer = true;
+            GestorIdioma.GetInstance.Attach(this);
         }
 
         private void cargarFormulario(Form formulario)
@@ -57,7 +60,7 @@ namespace UI
         {
             SessionManager sessionManager = SessionManager.getInstance;
             sessionManager.LogOut();
-            MessageBox.Show("Sesión cerrada correctamente.", "Cerrar sesión", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("SesiÃ³n cerrada correctamente.", "Cerrar sesiÃ³n", MessageBoxButtons.OK, MessageBoxIcon.Information);
             LoginUI loginUI = new LoginUI();
             cargarFormulario(loginUI);
             mainUIStripMenuItemCerrarSesion.Enabled = false;
@@ -86,6 +89,32 @@ namespace UI
         {
             BitacoraUI bitacoraUI = new BitacoraUI();
             cargarFormulario(bitacoraUI);
+        }
+        
+        private void ComboIdiomasGlobal_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            if (comboIdiomasGlobal.SelectedItem == null) return;
+            string idiomaSeleccionado = comboIdiomasGlobal.SelectedItem.ToString()!;
+
+            GestorIdioma.GetInstance.CambiarIdioma(idiomaSeleccionado);
+        }
+
+        public void Update(Usuario usuarioInvolucrado, string action)
+        {
+            if (action.StartsWith("Idioma:"))
+            {
+                string codigoIdioma = action.Split(':')[1];
+
+                Dictionary<string, string> traducciones = GestorIdioma.GetInstance.ObtenerTraduccionesActuales(codigoIdioma);
+
+                TranslateServices.TraducirObjeto(this, traducciones);
+            }
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            GestorIdioma.GetInstance.Detach(this);
+            base.OnFormClosed(e);
         }
     }
 }

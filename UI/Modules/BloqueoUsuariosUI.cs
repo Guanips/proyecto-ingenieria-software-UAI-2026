@@ -1,6 +1,6 @@
 ﻿namespace UI.Modules
 {
-    public partial class BloqueoUsuariosUI : Form
+    public partial class BloqueoUsuariosUI : FormBaseObserver
     {
         public BloqueoUsuariosUI()
         {

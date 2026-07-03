@@ -1,19 +1,22 @@
 ﻿using BE;
 using BLL;
 using servicios;
+using System.Collections.Generic;
 
 namespace UI.Login
 {
-    public partial class LoginUI : Form
+    public partial class LoginUI : FormBaseObserver, IObserver
     {
 
         private GestorLogin gestorLogin;
         public event EventHandler? SesionIniciada;
+        //private RepositorioIdioma repoIdioma = new RepositorioIdioma();
 
         public LoginUI()
         {
             InitializeComponent();
             gestorLogin = new GestorLogin();
+            GestorIdioma.GetInstance.Attach(this);
         }
 
         private void loginUIButtonIniciarSesion_Click(object sender, EventArgs e)
@@ -45,6 +48,34 @@ namespace UI.Login
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+        //public void Update(Usuario usuarioInvolucrado, string action)
+        //{
+        //    if (action.StartsWith("Idioma:"))
+        //    {
+        //        string codigoIdioma = action.Split(':')[1];
+        //        var traducciones = GestorIdioma.GetInstance.ObtenerTraduccionesActuales(codigoIdioma);
+
+        //        // Al servicio no le importa qué es 'this', lo inspecciona dinámicamente en caliente
+        //        TranslateServices.TraducirObjeto(this, traducciones);
+        //    }
+        //}
+        public void Update(Usuario usuarioInvolucrado, string action)
+        {
+            if (action.StartsWith("Idioma:"))
+            {
+                string codigoIdioma = action.Split(':')[1];
+
+                Dictionary<string, string> traducciones = GestorIdioma.GetInstance.ObtenerTraduccionesActuales(codigoIdioma);
+
+                TranslateServices.TraducirObjeto(this, traducciones);
+            }
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            GestorIdioma.GetInstance.Detach(this);
+            base.OnFormClosed(e);
         }
     }
 }

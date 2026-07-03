@@ -33,8 +33,28 @@ namespace BLL
             RepositorioUsuarios RepoUsuarios = RepositorioUsuarios.GetInstance;
             if (!RepoUsuarios.VerificarExistenciaDeUsername(usuario)) throw new Exception("Usuario incorrecto");
             Usuario _user = RepoUsuarios.ObtenerUsuario(usuario);
+            if (_user.EstaBloqueado) throw new Exception("El usuario se encuentra bloqueado. Contacte a un administrador para recuperar el acceso.");
             string hash = CryptoService.EncriptarPassword(pass);
-            if (!CryptoService.Comparer(hash, _user.PasswordHash)) throw new Exception("Contraseña incorrecta");
+
+            if (!CryptoService.Comparer(hash, _user.PasswordHash))
+            {
+                int nuevosIntentos = _user.IntentosFallidos + 1;
+                RepoUsuarios.ActualizarIntentosFallidos(usuario, nuevosIntentos);
+
+                if (nuevosIntentos >= 3)
+                {
+                    RepoUsuarios.CambiarEstadoBloqueo(usuario, true);
+                    throw new Exception("Ha superado los 3 intentos fallidos. Su cuenta ha sido bloqueada por seguridad.");
+                }
+
+                throw new Exception($"Contraseña incorrecta. Le quedan {3 - nuevosIntentos} intentos antes de bloquearse.");
+            }
+
+            if (_user.IntentosFallidos > 0)
+            {
+                RepoUsuarios.ActualizarIntentosFallidos(usuario, 0);
+            }
+
             SessionManager.getInstance.LogIn(_user);
             Notificar(_user, "Inicio De Sesion");
         }
