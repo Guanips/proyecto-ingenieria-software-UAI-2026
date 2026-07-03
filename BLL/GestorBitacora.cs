@@ -20,7 +20,7 @@ namespace BLL
         public void Update(Usuario usuarioInvolucrado, string action)
         {
             Registro nRegistro = new Registro(usuarioInvolucrado.Username, DateTime.Now, action);
-            RepoBitacora.AlmacenarRegistro(nRegistro, usuarioInvolucrado.Id.ToString());
+            RepoBitacora.AlmacenarRegistro(nRegistro, usuarioInvolucrado.Username);
         }
     }
 }

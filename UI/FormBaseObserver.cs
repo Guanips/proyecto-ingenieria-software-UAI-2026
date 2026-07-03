@@ -12,30 +12,26 @@ namespace UI
     {
         public FormBaseObserver()
         {
-            if (EsModoDiseno()) return;
-
-            // Si llegamos aquí, el programa se está ejecutando de verdad
-            GestorIdioma.GetInstance.Attach(this); 
+            
         }
 
-            protected bool EsModoDiseno()
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            if (!EsModoDiseno())
             {
-                if (LicenseManager.UsageMode == LicenseUsageMode.Designtime) return true;
-
-                // Verificación agresiva para el diseñador fuera de proceso de .NET 8
-                string processName = System.Diagnostics.Process.GetCurrentProcess().ProcessName;
-                return processName.Contains("devenv") || processName.Contains("DesignToolsServer");
+                GestorIdioma.GetInstance.Attach(this);
             }
+        }
 
-            //// Validamos si estamos en modo diseño (dentro de Visual Studio)
-            //if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
-            //{
-            //    return; // Cortamos la ejecución aquí para que no busque la BD
-            //}
+        protected bool EsModoDiseno()
+        {
+            if (LicenseManager.UsageMode == LicenseUsageMode.Designtime) return true;
 
-            //// Si llegamos aquí, el programa se está ejecutando de verdad
-            //GestorIdioma.GetInstance.Attach(this);
-        
+            string processName = System.Diagnostics.Process.GetCurrentProcess().ProcessName;
+            return processName.Contains("devenv") || processName.Contains("DesignToolsServer");
+        }
 
         public virtual void Update(Usuario usuarioInvolucrado, string action)
         {
@@ -53,17 +49,9 @@ namespace UI
 
         protected virtual void TraducirElementosParticulares(string codigoIdioma)
         {
+            
         }
 
-        //protected override void OnFormClosed(FormClosedEventArgs e)
-        //{
-        //    // Validamos también al cerrar para evitar errores en modo diseño
-        //    if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
-        //    {
-        //        GestorIdioma.GetInstance.Detach(this);
-        //    }
-        //    base.OnFormClosed(e);
-        //}
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
             if (!EsModoDiseno())

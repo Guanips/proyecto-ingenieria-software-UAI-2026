@@ -18,6 +18,7 @@ namespace UI.Modules
             InitializeComponent();
             gestorBitacora = new GestorBitacora();
             this.Load += BitacoraUI_Load;
+            this.btnLimpiarFiltros.Click += btnLimpiarFiltros_Click;
         }
 
         private void BitacoraUI_Load(object? sender, EventArgs e)
@@ -125,6 +126,17 @@ namespace UI.Modules
 
                 if (traducciones.ContainsKey("GridBitacora_Accion") && dataGridViewBitacora.Columns["AccionRealizada"] != null)
                     dataGridViewBitacora.Columns["AccionRealizada"].HeaderText = traducciones["GridBitacora_Accion"];
+            }
+        }
+        public override void Update(Usuario usuarioInvolucrado, string action)
+        {
+            // 1. Ejecutamos la lógica base (que traduce controles sueltos y llama a TraducirElementosParticulares)
+            base.Update(usuarioInvolucrado, action);
+
+            // 2. Si la notificación es un cambio de idioma, forzamos la recarga de las filas
+            if (action.StartsWith("Idioma:"))
+            {
+                AplicarFiltros();
             }
         }
     }

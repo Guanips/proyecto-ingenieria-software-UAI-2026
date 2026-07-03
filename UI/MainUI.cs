@@ -104,21 +104,41 @@ namespace UI
 
         private void mainUIStripMenuItemCerrarSesion_Click(object sender, EventArgs e)
         {
-            SessionManager sessionManager = SessionManager.getInstance;
-            sessionManager.LogOut();
+            //SessionManager sessionManager = SessionManager.getInstance;
+            //sessionManager.LogOut();
+
+            //string mensaje = GestorIdioma.GetInstance.TraducirMensaje("msg_CierreSesionExito", "Sesión cerrada correctamente.");
+            //string titulo = GestorIdioma.GetInstance.TraducirMensaje("msg_TituloCierreSesion", "Cerrar sesión");
+
+            //MessageBox.Show(mensaje, titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            ////MessageBox.Show("Sesión cerrada correctamente.", "Cerrar sesión", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //LoginUI loginUI = new LoginUI();
+            //cargarFormulario(loginUI);
+            //foreach (ToolStripMenuItem item in menuStrip1.Items)
+            //{
+            //    item.Enabled = false;
+            //}
+            //mainUIStripMenuItemCerrarSesion.Enabled = false;
+            //mainUIStripMenuItemIniciarSesion.Enabled = true;
+            GestorLogin gestorLogin = new GestorLogin();
+
+            // 2. Ejecutamos el cierre a través del gestor para disparar la notificación
+            gestorLogin.LogOut();
 
             string mensaje = GestorIdioma.GetInstance.TraducirMensaje("msg_CierreSesionExito", "Sesión cerrada correctamente.");
             string titulo = GestorIdioma.GetInstance.TraducirMensaje("msg_TituloCierreSesion", "Cerrar sesión");
 
             MessageBox.Show(mensaje, titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-            //MessageBox.Show("Sesión cerrada correctamente.", "Cerrar sesión", MessageBoxButtons.OK, MessageBoxIcon.Information);
             LoginUI loginUI = new LoginUI();
             cargarFormulario(loginUI);
+
             foreach (ToolStripMenuItem item in menuStrip1.Items)
             {
                 item.Enabled = false;
             }
+
             mainUIStripMenuItemCerrarSesion.Enabled = false;
             mainUIStripMenuItemIniciarSesion.Enabled = true;
         }
