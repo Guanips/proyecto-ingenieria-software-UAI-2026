@@ -8,7 +8,10 @@ namespace BLL
     {
         private List<IObserver> ObserversAttached = new List<IObserver>();
 
-        public GestorUsuarios() { }
+        public GestorUsuarios()
+        {
+            Attach(GestorBitacora.GetInstance);
+        }
 
         public void Attach(IObserver observer)
         {
@@ -22,12 +25,11 @@ namespace BLL
             ObserversAttached.Remove(observer);
         }
 
-        public void Notificar(Usuario usuarioInvolucrado, string action)
+        public void Notificar(string username, string action)
         {
             foreach (IObserver item in ObserversAttached)
             {
-                item.Update(usuarioInvolucrado, action)
-;
+                item.Update(username, action);
             }
         }
 
@@ -46,11 +48,13 @@ namespace BLL
 
             Usuario nuevoUsuario = new Usuario(Guid.NewGuid(), nUsername, passwordHash, nEmail, nNumTelefono, false);
             RepositorioUsuarios.GetInstance.AgregarUsuario(nuevoUsuario);
+            Notificar(SessionManager.getInstance.ObtenerUsuarioActivo()!.Username, "Registro de usuario");
         }
 
         public void EliminarUsuario(string nUsername)
         {
             RepositorioUsuarios.GetInstance.EliminarUsuario(nUsername);
+            Notificar(SessionManager.getInstance.ObtenerUsuarioActivo()!.Username, "Eliminación de usuario");
         }
 
         public void ModificarUsuario(string nUsername, string nEmail, string nNumTelefono)
@@ -58,6 +62,7 @@ namespace BLL
             Usuario usuarioObtenido = RepositorioUsuarios.GetInstance.ObtenerUsuario(nUsername);
             Usuario usuarioModificado = new Usuario(usuarioObtenido.Id, nUsername, usuarioObtenido.PasswordHash, nEmail, nNumTelefono, usuarioObtenido.EstaBloqueado);
             RepositorioUsuarios.GetInstance.ModificarUsuario(usuarioModificado);
+            Notificar(SessionManager.getInstance.ObtenerUsuarioActivo()!.Username, "Modificación de usuario");
         }
     }
 }

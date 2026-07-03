@@ -5,22 +5,59 @@ namespace BLL
 {
     public class GestorBitacora : IObserver
     {
+        private static GestorBitacora? Instance;
+        private static readonly object _lock = new object();
+
         private RepositorioBitacora RepoBitacora { get; set; }
 
-        public GestorBitacora()
+        private GestorBitacora()
         {
             this.RepoBitacora = new RepositorioBitacora();
         }
 
-        public List<object> ConsultarBitacora()
+        public static GestorBitacora GetInstance
         {
-            return (from a in RepoBitacora.ListarRegistros() select new { Usuario = a.Username, Fecha = a.Fecha, Accion = a.Accion }).ToList<object>();
+            get
+            {
+                if (Instance == null)
+                {
+                    lock (_lock)
+                    {
+                        if (Instance == null)
+                        {
+                            Instance = new GestorBitacora();
+                        }
+                    }
+                }
+
+                return Instance;
+            }
         }
 
-        public void Update(Usuario usuarioInvolucrado, string action)
+        public List<Registro> ConsultarBitacoraCompleta()
         {
-            Registro nRegistro = new Registro(usuarioInvolucrado.Username, DateTime.Now, action);
-            RepoBitacora.AlmacenarRegistro(nRegistro, usuarioInvolucrado.Id.ToString());
+            List<Registro> registros = RepoBitacora.ListarRegistros();
+            return registros;
+        }
+
+        public List<Registro> ConsultarBitacoraFiltradaPorUsername(string username)
+        {
+            List<Registro> registros = RepoBitacora.ListarRegistros();
+            List<Registro> registrosFiltrados = registros.FindAll(r => r.Username == username);
+            return registrosFiltrados;
+        }
+
+        public List<Registro> ConsultarBitacoraFiltradaPorAccion(string accion)
+        {
+            List<Registro> registros = RepoBitacora.ListarRegistros();
+            List<Registro> registrosFiltrados = registros.FindAll(r => r.Accion == accion);
+            return registrosFiltrados;
+        }
+
+        public void Update(string username, string action)
+        {
+            Registro nRegistro = new Registro(username, DateTime.Now, action);
+            RepoBitacora.AlmacenarRegistro(nRegistro);
         }
     }
 }

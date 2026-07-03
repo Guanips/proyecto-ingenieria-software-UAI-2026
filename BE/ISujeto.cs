@@ -4,6 +4,6 @@
     {
         public abstract void Attach(IObserver observer);
         public abstract void Detach(IObserver observer);
-        public abstract void Notificar(Usuario usuarioInvolucrado, string accion);
+        public abstract void Notificar(string username, string accion);
     }
 }

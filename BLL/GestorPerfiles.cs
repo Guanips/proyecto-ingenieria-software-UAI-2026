@@ -3,13 +3,15 @@ using DAL;
 
 namespace BLL
 {
-    public class GestorPerfiles
+    public class GestorPerfiles : ISujeto
     {
         private RepositorioPerfiles repositorioPerfiles;
+        private List<IObserver> ObserversAttached = new List<IObserver>();
 
         public GestorPerfiles()
         {
             repositorioPerfiles = new RepositorioPerfiles();
+            Attach(GestorBitacora.GetInstance);
         }
 
         public void CrearPerfil(string nombrePerfil)
@@ -21,6 +23,7 @@ namespace BLL
                 throw new Exception($"Ya existe un permiso o perfil con el nombre '{nombrePerfil}'.");
             }
             repositorioPerfiles.CrearPerfil(nombrePerfil);
+            Notificar(ObtenerUsuarioActivo().Username, $"Creación de perfil");
         }
 
         public void AgregarPermisoAPerfil(uint idPerfil, uint idPermiso)
@@ -46,6 +49,7 @@ namespace BLL
             }
 
             repositorioPerfiles.AsociarPermisoConPermiso(idPerfil, idPermiso);
+            Notificar(ObtenerUsuarioActivo().Username, $"Asignación de permiso a perfil");
         }
 
         public void AgregarPerfilAPerfil(uint idPerfilPadre, uint idPerfilHijo)
@@ -84,6 +88,7 @@ namespace BLL
             }
 
             repositorioPerfiles.AsociarPermisoConPermiso(idPerfilPadre, idPerfilHijo);
+            Notificar(ObtenerUsuarioActivo().Username, $"Asociación de perfil a perfil");
         }
 
         public void AgregarPerfilAUsuario(string username, uint idPerfil)
@@ -91,6 +96,7 @@ namespace BLL
             Usuario usuarioSeleccionado = RepositorioUsuarios.GetInstance.ObtenerUsuario(username);
             if (usuarioSeleccionado.Permisos.Any(p => p.ID == idPerfil)) throw new Exception("El usuario seleccionado ya posee ese perfil");
             repositorioPerfiles.AsociarPerfilAUsuario(usuarioSeleccionado, idPerfil);
+            Notificar(ObtenerUsuarioActivo().Username, $"Asignación de perfil a usuario");
         }
 
         private bool ContieneReferenciaCircular(Perfil perfilHijo, uint idPerfilPadre, List<Permiso> permisosGlobales)
@@ -135,6 +141,7 @@ namespace BLL
             Usuario usuarioSeleccionado = RepositorioUsuarios.GetInstance.ObtenerUsuario(username);
             if (!usuarioSeleccionado.Permisos.Any(p => p.ID == idPerfil)) throw new Exception("El usuario seleccionado no posee ese perfil");
             repositorioPerfiles.DesasociarPerfilDeUsuario(usuarioSeleccionado.Id, idPerfil);
+            Notificar(ObtenerUsuarioActivo().Username, $"Desasignación de perfil de usuario");
         }
 
         public List<Permiso> ListarPermisos()
@@ -145,6 +152,38 @@ namespace BLL
         public List<Usuario> ListarUsuarios()
         {
             return RepositorioUsuarios.GetInstance.ObtenerListadoTotalUsuarios();
+        }
+
+        public void Update(Usuario usuarioInvolucrado, string action)
+        {
+
+        }
+
+        public void Attach(IObserver observer)
+        {
+            ObserversAttached.Add(observer);
+        }
+
+        public void Detach(IObserver observer)
+        {
+            IObserver? foundObserver = ObserversAttached.Find((item) => item == observer);
+            if (foundObserver == null) throw new Exception("Observer no agregado");
+            ObserversAttached.Remove(observer);
+        }
+
+        public void Notificar(string username, string accion)
+        {
+            foreach (IObserver item in ObserversAttached)
+            {
+                item.Update(username, accion);
+            }
+        }
+
+        private Usuario ObtenerUsuarioActivo()
+        {
+            Usuario? usuarioActivo = SessionManager.getInstance.ObtenerUsuarioActivo();
+            if (usuarioActivo == null) throw new Exception("Debe haber un usuario activo para registrar la acción.");
+            return usuarioActivo;
         }
     }
 }

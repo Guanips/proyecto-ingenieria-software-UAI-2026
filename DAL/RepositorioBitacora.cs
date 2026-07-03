@@ -8,6 +8,7 @@ namespace DAL
         public RepositorioBitacora() { }
 
         public List<Registro> ListarRegistros() => MappearRegistros();
+
         private List<Registro> MappearRegistros()
         {
             DAO dao = DAO.GetInstance;
@@ -19,13 +20,12 @@ namespace DAL
             List<Registro> _listRegistro = new List<Registro>();
             foreach (DataRow dr in tablaBitacora.Rows)
             {
-                DataRow? usuarioRelacionado = dr.GetParentRow("FK_Bitacora_Usuario");
-                if (usuarioRelacionado == null) throw new Exception("Usuario relacionado a registro de bitacora no encontrado");
-                _listRegistro.Add(new Registro((string)usuarioRelacionado[1], (DateTime)dr[2], (string)dr[3]));
+                _listRegistro.Add(new Registro((string)dr["Username"], (DateTime)dr["Fecha"], (string)dr["Accion"]));
             }
             return _listRegistro;
         }
-        public void AlmacenarRegistro(Registro nRegistro, string idUsuarioInvolucrado)
+
+        public void AlmacenarRegistro(Registro nRegistro)
         {
             DAO dao = DAO.GetInstance;
             DataSet ds = dao.ObtenerDataSet();
@@ -34,9 +34,9 @@ namespace DAL
             if (tablaBitacora == null) throw new Exception("Tabla de bitacora no encontrada en el DataSet");
 
             DataRow nFilaRegistro = tablaBitacora.NewRow();
-            nFilaRegistro[1] = idUsuarioInvolucrado;
-            nFilaRegistro[2] = nRegistro.Fecha;
-            nFilaRegistro[3] = nRegistro.Accion;
+            nFilaRegistro["Username"] = nRegistro.Username;
+            nFilaRegistro["Fecha"] = nRegistro.Fecha;
+            nFilaRegistro["Accion"] = nRegistro.Accion;
             tablaBitacora.Rows.Add(nFilaRegistro);
             dao.SubirCambiosBD();
         }
