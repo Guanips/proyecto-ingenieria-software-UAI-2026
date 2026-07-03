@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows.Forms;
 using BE;
 using BLL;
@@ -11,8 +12,30 @@ namespace UI
     {
         public FormBaseObserver()
         {
-            GestorIdioma.GetInstance.Attach(this);
+            if (EsModoDiseno()) return;
+
+            // Si llegamos aquí, el programa se está ejecutando de verdad
+            GestorIdioma.GetInstance.Attach(this); 
         }
+
+            protected bool EsModoDiseno()
+            {
+                if (LicenseManager.UsageMode == LicenseUsageMode.Designtime) return true;
+
+                // Verificación agresiva para el diseñador fuera de proceso de .NET 8
+                string processName = System.Diagnostics.Process.GetCurrentProcess().ProcessName;
+                return processName.Contains("devenv") || processName.Contains("DesignToolsServer");
+            }
+
+            //// Validamos si estamos en modo diseño (dentro de Visual Studio)
+            //if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
+            //{
+            //    return; // Cortamos la ejecución aquí para que no busque la BD
+            //}
+
+            //// Si llegamos aquí, el programa se está ejecutando de verdad
+            //GestorIdioma.GetInstance.Attach(this);
+        
 
         public virtual void Update(Usuario usuarioInvolucrado, string action)
         {
@@ -32,10 +55,21 @@ namespace UI
         {
         }
 
+        //protected override void OnFormClosed(FormClosedEventArgs e)
+        //{
+        //    // Validamos también al cerrar para evitar errores en modo diseño
+        //    if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+        //    {
+        //        GestorIdioma.GetInstance.Detach(this);
+        //    }
+        //    base.OnFormClosed(e);
+        //}
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
-            // Al cerrarse la pantalla, se desvincula para evitar fugas de memoria
-            GestorIdioma.GetInstance.Detach(this);
+            if (!EsModoDiseno())
+            {
+                GestorIdioma.GetInstance.Detach(this);
+            }
             base.OnFormClosed(e);
         }
     }

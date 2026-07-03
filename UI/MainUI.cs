@@ -74,6 +74,26 @@ namespace UI
             cargarFormulario(loginUI);
 
             mainUIStripMenuItemCerrarSesion.Enabled = false;
+
+            var listaIdiomas = GestorIdioma.GetInstance.ObtenerIdiomasDisponibles();
+
+            comboIdiomasGlobal.SelectedIndexChanged -= ComboIdiomasGlobal_SelectedIndexChanged;
+
+            comboIdiomasGlobal.DataSource = listaIdiomas;
+            comboIdiomasGlobal.DisplayMember = "Nombre";
+            comboIdiomasGlobal.ValueMember = "Codigo";
+
+            Usuario? usuarioActivo = SessionManager.getInstance.ObtenerUsuarioActivo();
+            if (usuarioActivo != null && !string.IsNullOrEmpty(usuarioActivo.Idioma))
+            {
+                comboIdiomasGlobal.SelectedValue = usuarioActivo.Idioma;
+            }
+            else
+            {
+                comboIdiomasGlobal.SelectedValue = "ES";
+            }
+            comboIdiomasGlobal.SelectedIndexChanged += ComboIdiomasGlobal_SelectedIndexChanged;
+
         }
 
         private void mainUIStripMenuItemIniciarSesion_Click(object sender, EventArgs e)
@@ -86,7 +106,13 @@ namespace UI
         {
             SessionManager sessionManager = SessionManager.getInstance;
             sessionManager.LogOut();
-            MessageBox.Show("Sesión cerrada correctamente.", "Cerrar sesión", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            string mensaje = GestorIdioma.GetInstance.TraducirMensaje("msg_CierreSesionExito", "Sesión cerrada correctamente.");
+            string titulo = GestorIdioma.GetInstance.TraducirMensaje("msg_TituloCierreSesion", "Cerrar sesión");
+
+            MessageBox.Show(mensaje, titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            //MessageBox.Show("Sesión cerrada correctamente.", "Cerrar sesión", MessageBoxButtons.OK, MessageBoxIcon.Information);
             LoginUI loginUI = new LoginUI();
             cargarFormulario(loginUI);
             foreach (ToolStripMenuItem item in menuStrip1.Items)
@@ -124,9 +150,10 @@ namespace UI
         private void ComboIdiomasGlobal_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (comboIdiomasGlobal.SelectedItem == null) return;
-            string idiomaSeleccionado = comboIdiomasGlobal.SelectedItem.ToString()!;
 
-            GestorIdioma.GetInstance.CambiarIdioma(idiomaSeleccionado);
+            BE.Idioma idiomaSeleccionado = (BE.Idioma)comboIdiomasGlobal.SelectedItem;
+
+            GestorIdioma.GetInstance.CambiarIdioma(idiomaSeleccionado.Codigo);
         }
 
         public void Update(Usuario usuarioInvolucrado, string action)

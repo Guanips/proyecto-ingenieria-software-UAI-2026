@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BE;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -49,29 +50,27 @@ namespace DAL
             return diccionarioResult;
         }
 
-        /*
-            -- 1. Tabla de Idiomas
-            CREATE TABLE Idioma (
-                Codigo VARCHAR(5) NOT NULL,   -- Ej: 'ES', 'EN'
-                Nombre VARCHAR(50) NOT NULL,  -- Ej: 'Español', 'English'
-                CONSTRAINT PK_Idioma PRIMARY KEY (Codigo)
-            );
+        public List<Idioma> ObtenerTodosLosIdiomas()
+        {
+            List<Idioma> lista = new List<Idioma>();
 
-            -- 2. Tabla de Traducciones
-            CREATE TABLE Traduccion (
-                IdTraduccion INT IDENTITY(1,1) NOT NULL,
-                CodigoIdioma VARCHAR(5) NOT NULL,
-                KeyEtiqueta VARCHAR(100) NOT NULL, -- El nombre del control (Ej: loginUILabelUsername)
-                Texto NVARCHAR(MAX) NOT NULL,      -- El texto a mostrar (Ej: 'Nombre de usuario')
-                CONSTRAINT PK_Traduccion PRIMARY KEY (IdTraduccion),
-                CONSTRAINT FK_Traduccion_Idioma FOREIGN KEY (CodigoIdioma) REFERENCES Idioma(Codigo)
-            );
+            // Accedemos al DataSet centralizado a través de tu DAO
+            DataSet ds = DAO.GetInstance.ObtenerDataSet();
+            DataTable dtIdiomas = ds.Tables["Idioma"];
 
-            -- 3. Índice Único: Asegura que no puedas tener dos "loginUILabelUsername" para el idioma "ES"
-            CREATE UNIQUE INDEX UIX_Idioma_Etiqueta ON Traduccion(CodigoIdioma, KeyEtiqueta);
+            if (dtIdiomas != null)
+            {
+                foreach (DataRow row in dtIdiomas.Rows)
+                {
+                    string codigo = row["Codigo"].ToString() ?? string.Empty;
+                    string nombre = row["Nombre"].ToString() ?? string.Empty;
 
-            ALTER TABLE Usuario ADD IntentosFallidos INT NOT NULL DEFAULT 0;
-         
-         */
+                    lista.Add(new Idioma(codigo, nombre));
+                }
+            }
+
+            return lista;
+        }
+
     }
 }

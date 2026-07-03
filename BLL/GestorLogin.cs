@@ -31,11 +31,20 @@ namespace BLL
         public void LogIn(string usuario, string pass)
         {
             RepositorioUsuarios RepoUsuarios = RepositorioUsuarios.GetInstance;
-            if (!RepoUsuarios.VerificarExistenciaDeUsername(usuario)) throw new Exception("Usuario incorrecto");
+            if (!RepoUsuarios.VerificarExistenciaDeUsername(usuario))
+            {
+                string msg = GestorIdioma.GetInstance.TraducirMensaje("err_UsuarioIncorrecto", "Usuario incorrecto");
+                throw new Exception(msg);
+            }
             Usuario _user = RepoUsuarios.ObtenerUsuario(usuario);
-            if (_user.EstaBloqueado) throw new Exception("El usuario se encuentra bloqueado. Contacte a un administrador para recuperar el acceso.");
+            if (_user.EstaBloqueado)
+            {
+                string msg = GestorIdioma.GetInstance.TraducirMensaje("err_UsuarioBloqueado", "El usuario se encuentra bloqueado. Contacte a un administrador para recuperar el acceso.");
+                throw new Exception(msg);
+            }
             string hash = CryptoService.EncriptarPassword(pass);
 
+            
             if (!CryptoService.Comparer(hash, _user.PasswordHash))
             {
                 int nuevosIntentos = _user.IntentosFallidos + 1;
@@ -44,10 +53,12 @@ namespace BLL
                 if (nuevosIntentos >= 3)
                 {
                     RepoUsuarios.CambiarEstadoBloqueo(usuario, true);
-                    throw new Exception("Ha superado los 3 intentos fallidos. Su cuenta ha sido bloqueada por seguridad.");
+                    string msgBloqueo = GestorIdioma.GetInstance.TraducirMensaje("err_MaxIntentos", "Ha superado los 3 intentos fallidos. Su cuenta ha sido bloqueada por seguridad.");
+                    throw new Exception(msgBloqueo);
                 }
 
-                throw new Exception($"Contraseña incorrecta. Le quedan {3 - nuevosIntentos} intentos antes de bloquearse.");
+                string msgIntentos = GestorIdioma.GetInstance.TraducirMensaje("err_QuedanIntentos", "Contraseña incorrecta. Le quedan {0} intentos antes de bloquearse.");
+                throw new Exception(string.Format(msgIntentos, 3 - nuevosIntentos));
             }
 
             if (_user.IntentosFallidos > 0)
@@ -55,16 +66,24 @@ namespace BLL
                 RepoUsuarios.ActualizarIntentosFallidos(usuario, 0);
             }
 
+            string logInicio = GestorIdioma.GetInstance.TraducirMensaje("log_InicioSesion", "Inicio De Sesion");
+            
             SessionManager.getInstance.LogIn(_user);
-            Notificar(_user, "Inicio De Sesion");
+            Notificar(_user, "LOG_LOGIN");
         }
 
         public void LogOut()
         {
             Usuario? usuarioActivo = SessionManager.getInstance.ObtenerUsuarioActivo();
-            if (usuarioActivo == null) throw new Exception("Usuario activo no encontrado en logout");
+            if (usuarioActivo == null)
+            {
+                string msgNoUser = GestorIdioma.GetInstance.TraducirMensaje("err_NoUserLogout", "Usuario activo no encontrado en logout");
+                throw new Exception(msgNoUser);
+            }
 
-            Notificar(usuarioActivo, "Cierre de Sesion");
+            string logCierre = GestorIdioma.GetInstance.TraducirMensaje("log_CierreSesion", "Cierre de Sesion");
+            
+            Notificar(usuarioActivo, "LOG_LOGOUT");
             SessionManager.getInstance.LogOut();
         }
 

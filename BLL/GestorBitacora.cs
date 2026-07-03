@@ -12,9 +12,9 @@ namespace BLL
             this.RepoBitacora = new RepositorioBitacora();
         }
 
-        public List<object> ConsultarBitacora()
+        public List<Registro> ConsultarBitacora()
         {
-            return (from a in RepoBitacora.ListarRegistros() select new { Usuario = a.Username, Fecha = a.Fecha, Accion = a.Accion }).ToList<object>();
+            return RepoBitacora.ListarRegistros();
         }
 
         public void Update(Usuario usuarioInvolucrado, string action)

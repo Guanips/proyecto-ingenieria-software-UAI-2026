@@ -45,11 +45,17 @@ namespace BLL
 
             Usuario nuevoUsuario = new Usuario(Guid.NewGuid(), nUsername, passwordHash, nEmail, nNumTelefono, false, nIdioma, 0);
             RepositorioUsuarios.GetInstance.AgregarUsuario(nuevoUsuario);
+
+            Usuario? activo = SessionManager.getInstance.ObtenerUsuarioActivo();
+            if (activo != null) Notificar(activo, "LOG_USER_ADD");
+
         }
 
         public void EliminarUsuario(string nUsername)
         {
             RepositorioUsuarios.GetInstance.EliminarUsuario(nUsername);
+            Usuario? activo = SessionManager.getInstance.ObtenerUsuarioActivo();
+            if (activo != null) Notificar(activo, "LOG_USER_DEL");
         }
 
         public void ModificarUsuario(string nUsername, string nEmail, string nNumTelefono)
@@ -57,6 +63,9 @@ namespace BLL
             Usuario usuarioObtenido = RepositorioUsuarios.GetInstance.ObtenerUsuario(nUsername);
             Usuario usuarioModificado = new Usuario(usuarioObtenido.Id, nUsername, usuarioObtenido.PasswordHash, nEmail, nNumTelefono, usuarioObtenido.EstaBloqueado, usuarioObtenido.Idioma, usuarioObtenido.IntentosFallidos);
             RepositorioUsuarios.GetInstance.ModificarUsuario(usuarioModificado);
+
+            Usuario? activo = SessionManager.getInstance.ObtenerUsuarioActivo();
+            if (activo != null) Notificar(activo, "LOG_USER_MOD");
         }
     }
 }

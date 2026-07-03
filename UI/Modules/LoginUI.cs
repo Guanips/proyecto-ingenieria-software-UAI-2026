@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace UI.Login
 {
-    public partial class LoginUI : FormBaseObserver, IObserver
+    public partial class LoginUI : FormBaseObserver
     {
 
         private GestorLogin gestorLogin;
@@ -16,7 +16,7 @@ namespace UI.Login
         {
             InitializeComponent();
             gestorLogin = new GestorLogin();
-            GestorIdioma.GetInstance.Attach(this);
+            
         }
 
         private void loginUIButtonIniciarSesion_Click(object sender, EventArgs e)
@@ -31,51 +31,30 @@ namespace UI.Login
 
                 if (!usernameValidationResult.IsValid)
                 {
-                    throw new Exception(usernameValidationResult.ErrorMessage);
+                    string msgUser = GestorIdioma.GetInstance.TraducirMensaje(usernameValidationResult.ErrorMessage, "Error de validación");
+                    throw new Exception(msgUser);
                 }
 
                 if (isPasswordEmpty)
                 {
-                    throw new Exception("La contraseña no puede estar vacía.");
+                    string msgPass = GestorIdioma.GetInstance.TraducirMensaje("err_PassVacia", "La contraseña no puede estar vacía.");
+                    throw new Exception(msgPass);
                 }
 
                 gestorLogin.LogIn(nUsername, nPassword);
 
-                MessageBox.Show("Inicio de sesión exitoso.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                string mensaje = GestorIdioma.GetInstance.TraducirMensaje("msg_InicioSesionExito", "Inicio de sesión exitoso.");
+                string titulo = GestorIdioma.GetInstance.TraducirMensaje("msg_TituloExito", "Éxito");
+
+                MessageBox.Show(mensaje, titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 SesionIniciada?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                string tituloError = GestorIdioma.GetInstance.TraducirMensaje("msg_TituloError", "Error");
+                MessageBox.Show(ex.Message, tituloError, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        //public void Update(Usuario usuarioInvolucrado, string action)
-        //{
-        //    if (action.StartsWith("Idioma:"))
-        //    {
-        //        string codigoIdioma = action.Split(':')[1];
-        //        var traducciones = GestorIdioma.GetInstance.ObtenerTraduccionesActuales(codigoIdioma);
-
-        //        // Al servicio no le importa qué es 'this', lo inspecciona dinámicamente en caliente
-        //        TranslateServices.TraducirObjeto(this, traducciones);
-        //    }
-        //}
-        public void Update(Usuario usuarioInvolucrado, string action)
-        {
-            if (action.StartsWith("Idioma:"))
-            {
-                string codigoIdioma = action.Split(':')[1];
-
-                Dictionary<string, string> traducciones = GestorIdioma.GetInstance.ObtenerTraduccionesActuales(codigoIdioma);
-
-                TranslateServices.TraducirObjeto(this, traducciones);
-            }
-        }
-
-        protected override void OnFormClosed(FormClosedEventArgs e)
-        {
-            GestorIdioma.GetInstance.Detach(this);
-            base.OnFormClosed(e);
-        }
+        
     }
 }

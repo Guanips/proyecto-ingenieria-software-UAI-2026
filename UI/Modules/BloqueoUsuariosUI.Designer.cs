@@ -28,7 +28,30 @@
         /// </summary>
         private void InitializeComponent()
         {
+            dataGridViewBloqueados = new DataGridView();
+            btnDesbloquear = new Button();
+            ((System.ComponentModel.ISupportInitialize)dataGridViewBloqueados).BeginInit();
             SuspendLayout();
+            // 
+            // dataGridViewBloqueados
+            // 
+            dataGridViewBloqueados.AllowUserToAddRows = false;
+            dataGridViewBloqueados.AllowUserToDeleteRows = false;
+            dataGridViewBloqueados.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewBloqueados.Location = new Point(54, 28);
+            dataGridViewBloqueados.Name = "dataGridViewBloqueados";
+            dataGridViewBloqueados.ReadOnly = true;
+            dataGridViewBloqueados.Size = new Size(401, 265);
+            dataGridViewBloqueados.TabIndex = 0;
+            // 
+            // btnDesbloquear
+            // 
+            btnDesbloquear.Location = new Point(538, 55);
+            btnDesbloquear.Name = "btnDesbloquear";
+            btnDesbloquear.Size = new Size(75, 23);
+            btnDesbloquear.TabIndex = 1;
+            btnDesbloquear.Text = "Desbloquear";
+            btnDesbloquear.UseVisualStyleBackColor = true;
             // 
             // BloqueoUsuariosUI
             // 
@@ -36,13 +59,19 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
             ControlBox = false;
+            Controls.Add(btnDesbloquear);
+            Controls.Add(dataGridViewBloqueados);
             FormBorderStyle = FormBorderStyle.None;
             Name = "BloqueoUsuariosUI";
             Text = "BloqueoUsuariosUI";
             WindowState = FormWindowState.Maximized;
+            ((System.ComponentModel.ISupportInitialize)dataGridViewBloqueados).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
+
+        private DataGridView dataGridViewBloqueados;
+        private Button btnDesbloquear;
     }
 }

@@ -94,29 +94,19 @@ namespace UI.Modules
                 ValidationResult phoneVerificationResult = FormFieldValidationService.ValidatePhone(nNumTelefono);
 
                 if (!usernameValidationResult.IsValid)
-                {
-                    throw new Exception(usernameValidationResult.ErrorMessage);
-                }
+                    throw new Exception(GestorIdioma.GetInstance.TraducirMensaje(usernameValidationResult.ErrorMessage, "Error en username"));
 
                 if (!emailVerificationResult.IsValid)
-                {
-                    throw new Exception(emailVerificationResult.ErrorMessage);
-                }
+                    throw new Exception(GestorIdioma.GetInstance.TraducirMensaje(emailVerificationResult.ErrorMessage, "Error en email"));
 
                 if (!phoneVerificationResult.IsValid)
-                {
-                    throw new Exception(phoneVerificationResult.ErrorMessage);
-                }
+                    throw new Exception(GestorIdioma.GetInstance.TraducirMensaje(phoneVerificationResult.ErrorMessage, "Error en teléfono"));
 
                 if (string.IsNullOrEmpty(nPassword) || string.IsNullOrEmpty(nPasswordConfirmacion))
-                {
-                    throw new Exception("La contraseña no puede estar vacía.");
-                }
+                    throw new Exception(GestorIdioma.GetInstance.TraducirMensaje("err_PassVacia", "La contraseña no puede estar vacía."));
 
                 if (nPassword != nPasswordConfirmacion)
-                {
-                    throw new Exception("Las contraseñas no coinciden.");
-                }
+                    throw new Exception(GestorIdioma.GetInstance.TraducirMensaje("err_PassNoCoincide", "Las contraseñas no coinciden."));
 
                 gestorUsuarios.RegistrarUsuario(nUsername, nPassword, nEmail, nNumTelefono, "ES");
 
@@ -124,7 +114,8 @@ namespace UI.Modules
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al registrar usuario: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                string tituloError = GestorIdioma.GetInstance.TraducirMensaje("msg_TituloError", "Error");
+                MessageBox.Show(ex.Message, tituloError, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -132,7 +123,9 @@ namespace UI.Modules
         {
             try
             {
-                if (dataGridViewListadoUsuarios.SelectedRows.Count < 1) throw new Exception("No se ha seleccionado ningún usuario para eliminar.");
+                if (dataGridViewListadoUsuarios.SelectedRows.Count < 1)
+                    throw new Exception(GestorIdioma.GetInstance.TraducirMensaje("err_NoUserModificar", "No se ha seleccionado ningún usuario para modificar."));
+
                 DataGridViewRow selectedRow = dataGridViewListadoUsuarios.SelectedRows[0];
 
                 string nEmail = textBoxModificacionEmail.Text;
@@ -141,15 +134,19 @@ namespace UI.Modules
                 ValidationResult emailValidation = FormFieldValidationService.ValidateEmail(nEmail);
                 ValidationResult phoneValidation = FormFieldValidationService.ValidatePhone(nNumTelefono);
 
+                string tituloError = GestorIdioma.GetInstance.TraducirMensaje("msg_TituloError", "Error");
+
                 if (!emailValidation.IsValid)
                 {
-                    MessageBox.Show($"Error en el email: {emailValidation.ErrorMessage}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    string msgEmail = GestorIdioma.GetInstance.TraducirMensaje(emailValidation.ErrorMessage, "Error en el email");
+                    MessageBox.Show(msgEmail, tituloError, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
                 if (!phoneValidation.IsValid)
                 {
-                    MessageBox.Show($"Error en el número de teléfono: {phoneValidation.ErrorMessage}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    string msgPhone = GestorIdioma.GetInstance.TraducirMensaje(phoneValidation.ErrorMessage, "Error en el teléfono");
+                    MessageBox.Show(msgPhone, tituloError, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -159,7 +156,8 @@ namespace UI.Modules
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al modificar usuario: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                string tituloError = GestorIdioma.GetInstance.TraducirMensaje("msg_TituloError", "Error");
+                MessageBox.Show(ex.Message, tituloError, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -167,7 +165,9 @@ namespace UI.Modules
         {
             try
             {
-                if (dataGridViewListadoUsuarios.SelectedRows.Count < 1) throw new Exception("No se ha seleccionado ningún usuario para eliminar.");
+                if (dataGridViewListadoUsuarios.SelectedRows.Count < 1)
+                    throw new Exception(GestorIdioma.GetInstance.TraducirMensaje("err_NoUserEliminar", "No se ha seleccionado ningún usuario para eliminar."));
+
                 DataGridViewRow selectedRow = dataGridViewListadoUsuarios.SelectedRows[0];
                 Usuario selectedUsuario = (Usuario)selectedRow.DataBoundItem;
                 gestorUsuarios.EliminarUsuario(selectedUsuario.Username);
@@ -175,7 +175,8 @@ namespace UI.Modules
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al eliminar usuario: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                string tituloError = GestorIdioma.GetInstance.TraducirMensaje("msg_TituloError", "Error");
+                MessageBox.Show(ex.Message, tituloError, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

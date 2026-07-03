@@ -3,6 +3,7 @@ using DAL;
 using servicios;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,11 @@ namespace BLL
         private string _idiomaActual = "ES";
         private List<IObserver> ObserversAttached = new List<IObserver>();
         private RepositorioIdioma _repoIdioma = new RepositorioIdioma();
+        public List<Idioma> ObtenerIdiomasDisponibles()
+        {
+            // Llamamos al repositorio que lee directamente de la tabla Idioma de la BD
+            return _repoIdioma.ObtenerTodosLosIdiomas();
+        }
 
         private GestorIdioma() { }
 
@@ -62,6 +68,7 @@ namespace BLL
                 item.Update(usuarioInvolucrado, accion);
             }
         }
+        
 
         public void CambiarIdioma(string nuevoIdioma)
         {
@@ -89,6 +96,16 @@ namespace BLL
                 Usuario temporal = new Usuario(Guid.Empty, "invitado", "", "", "", false, nuevoIdioma, 0);
                 Notificar(temporal, $"Idioma:{nuevoIdioma}");
             }
+        }
+        public string TraducirMensaje(string keyEtiqueta, string mensajePorDefecto)
+        {
+            var traducciones = _repoIdioma.ObtenerTraducciones(_idiomaActual);
+
+            if (traducciones.ContainsKey(keyEtiqueta))
+            {
+                return traducciones[keyEtiqueta];
+            }
+            return mensajePorDefecto;
         }
     }
 }
