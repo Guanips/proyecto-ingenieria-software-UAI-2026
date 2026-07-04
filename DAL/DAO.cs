@@ -1,5 +1,8 @@
 ﻿using Microsoft.Data.SqlClient;
+using System;
 using System.Data;
+using System.IO;
+using System.Linq;
 using System.Text.Json;
 
 namespace DAL
@@ -10,13 +13,14 @@ namespace DAL
         private static readonly object _lock = new object();
 
         private DataSet mainDataSet;
-        private SqlDataAdapter daUsers, daBitacora, daPermiso, daPermisoRelacion, daIdioma, daTraduccion, daPerfilUsuario, daHistorialUsuario;
-        private SqlCommandBuilder cbUsers, cbBitacora, cbPermiso, cbPermisoRelacion, cbIdioma, cbTraduccion, cbPerfilUsuario, cbHistorialUsuario;
+
+        private SqlDataAdapter daUsers, daBitacora, daPermiso, daPermisoRelacion, daIdioma, daTraduccion, daPerfilUsuario, daHistorialUsuario, daDVV, daUsuarioBackup;
+        private SqlCommandBuilder cbUsers, cbBitacora, cbPermiso, cbPermisoRelacion, cbIdioma, cbTraduccion, cbPerfilUsuario, cbHistorialUsuario, cbDVV, cbUsuarioBackup;
+
         private DAO()
         {
             string connectionString = ObtenerStringConexionEnv();
 
-            // 1. Instanciar los DataAdapters con sus consultas base
             daUsers = new SqlDataAdapter("Select * From Usuario", connectionString);
             daBitacora = new SqlDataAdapter("Select * From Bitacora", connectionString);
             daPermiso = new SqlDataAdapter("Select * From Permiso", connectionString);
@@ -25,6 +29,8 @@ namespace DAL
             daTraduccion = new SqlDataAdapter("Select * From Traduccion", connectionString);
             daPerfilUsuario = new SqlDataAdapter("Select * From PerfilUsuario", connectionString);
             daHistorialUsuario = new SqlDataAdapter("Select * From HistorialUsuario", connectionString);
+            daDVV = new SqlDataAdapter("Select * From DVV", connectionString);
+            daUsuarioBackup = new SqlDataAdapter("Select * From UsuarioBackup", connectionString);
 
             daUsers.MissingSchemaAction = MissingSchemaAction.AddWithKey;
             daBitacora.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -34,6 +40,8 @@ namespace DAL
             daTraduccion.MissingSchemaAction = MissingSchemaAction.AddWithKey;
             daPerfilUsuario.MissingSchemaAction = MissingSchemaAction.AddWithKey;
             daHistorialUsuario.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+            daDVV.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+            daUsuarioBackup.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
             cbUsers = new SqlCommandBuilder(daUsers);
             cbBitacora = new SqlCommandBuilder(daBitacora);
@@ -45,7 +53,6 @@ namespace DAL
 
             mainDataSet = new DataSet("Users");
 
-            // 2. Abrir la conexión y CARGAR los datos PRIMERO
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
@@ -59,15 +66,18 @@ namespace DAL
                 CargarTablaConEsquema(daTraduccion, "Traduccion", conn);
                 CargarTablaConEsquema(daPerfilUsuario, "PerfilUsuario", conn);
                 CargarTablaConEsquema(daHistorialUsuario, "HistorialUsuario", conn);
+                CargarTablaConEsquema(daDVV, "DVV", conn);
+                CargarTablaConEsquema(daUsuarioBackup, "UsuarioBackup", conn);
             }
 
-            // 3. INSTANCIAR los CommandBuilders DESPUÉS de que las tablas tengan su esquema y PK cargados
             cbUsers = new SqlCommandBuilder(daUsers);
             cbBitacora = new SqlCommandBuilder(daBitacora);
             cbPermiso = new SqlCommandBuilder(daPermiso);
             cbPermisoRelacion = new SqlCommandBuilder(daPermisoRelacion);
             cbPerfilUsuario = new SqlCommandBuilder(daPerfilUsuario);
             cbHistorialUsuario = new SqlCommandBuilder(daHistorialUsuario);
+            cbDVV = new SqlCommandBuilder(daDVV);
+            cbUsuarioBackup = new SqlCommandBuilder(daUsuarioBackup);
 
             ConfigurarAutoincrementoGeneral();
             ArmarRelaciones();
@@ -83,29 +93,28 @@ namespace DAL
             adapter.SelectCommand.CommandText = $"Select * From {tableName}";
             adapter.SelectCommand.Connection = connection;
 
-            // Llenamos el esquema y los datos
             adapter.FillSchema(mainDataSet, SchemaType.Source, tableName);
             adapter.Fill(mainDataSet, tableName);
 
-            // DOBLE CHECK: Si por alguna razón el proveedor de SQL Server no mapeó la PK, la forzamos basándonos en la BD
             if (mainDataSet.Tables[tableName]!.PrimaryKey.Length == 0)
             {
-                // Esto le avisa al CommandBuilder de forma explícita cuál es la columna clave
-                // En tus tablas es 'ID', salvo en las compuestas como PermisoRelacion que usa ambas
                 if (tableName == "PermisoRelacion")
                 {
                     mainDataSet.Tables[tableName]!.PrimaryKey = new DataColumn[] {
-                mainDataSet.Tables[tableName]!.Columns["ID_Padre"]!,
-                mainDataSet.Tables[tableName]!.Columns["ID_Hijo"]!
-            };
+                        mainDataSet.Tables[tableName]!.Columns["ID_Padre"]!,
+                        mainDataSet.Tables[tableName]!.Columns["ID_Hijo"]!
+                    };
                 }
                 else if (tableName == "PerfilUsuario")
                 {
-                    // PerfilUsuario no tiene PK explícita en tu script (solo FKs), podrías asignarle una compuesta si la requiere:
                     mainDataSet.Tables[tableName]!.PrimaryKey = new DataColumn[] {
-                mainDataSet.Tables[tableName]!.Columns["ID_Usuario"]!,
-                mainDataSet.Tables[tableName]!.Columns["ID_Perfil"]!
-            };
+                        mainDataSet.Tables[tableName]!.Columns["ID_Usuario"]!,
+                        mainDataSet.Tables[tableName]!.Columns["ID_Perfil"]!
+                    };
+                }
+                else if (tableName == "DVV")
+                {
+                    mainDataSet.Tables[tableName]!.PrimaryKey = new DataColumn[] { mainDataSet.Tables[tableName]!.Columns["NombreTabla"]! };
                 }
                 else
                 {
@@ -157,8 +166,8 @@ namespace DAL
 
             DataRelation drIdiomaTraduccion = new DataRelation(
                 "FK_Traduccion_Idioma",
-                dtIdioma.Columns["Codigo"]!,        // PK en Idioma
-                dtTraduccion.Columns["CodigoIdioma"]! // FK en Traduccion
+                dtIdioma.Columns["Codigo"]!,
+                dtTraduccion.Columns["CodigoIdioma"]!
             );
 
             mainDataSet.Relations.Add(drIdiomaTraduccion);
@@ -240,27 +249,17 @@ namespace DAL
 
             if (directorioRaiz == null) throw new Exception("Raiz del proyecto no encontrada para cargar archivo de configuración");
 
-            // 1) Intentar cargar .env si existe
             string rutaArchivoEnv = Path.Combine(directorioRaiz.FullName, ".env");
             if (File.Exists(rutaArchivoEnv))
             {
-                try
-                {
-                    DotNetEnv.Env.Load(rutaArchivoEnv);
-                }
-                catch
-                {
-                    // Ignore .env parse errors and continue to other sources
-                }
+                try { DotNetEnv.Env.Load(rutaArchivoEnv); } catch { }
             }
 
-            // 2) Variables de entorno conocidas
             connectionString = Environment.GetEnvironmentVariable("SQL_SERVER_CONNECTION_STRING")
                 ?? Environment.GetEnvironmentVariable("ConnectionStrings__Default")
                 ?? Environment.GetEnvironmentVariable("ConnectionStrings:Default")
                 ?? Environment.GetEnvironmentVariable("DefaultConnection");
 
-            // 3) appsettings.json fallback
             if (connectionString == null)
             {
                 string rutaAppSettings = Path.Combine(directorioRaiz.FullName, "appsettings.json");
@@ -275,39 +274,20 @@ namespace DAL
                         if (root.TryGetProperty("ConnectionStrings", out JsonElement cs))
                         {
                             if (cs.TryGetProperty("Default", out JsonElement def) && def.ValueKind == JsonValueKind.String)
-                            {
                                 connectionString = def.GetString();
-                            }
                             else if (cs.TryGetProperty("SQL_SERVER_CONNECTION_STRING", out JsonElement ss) && ss.ValueKind == JsonValueKind.String)
-                            {
                                 connectionString = ss.GetString();
-                            }
-                            else
-                            {
-                                foreach (JsonProperty prop in cs.EnumerateObject())
-                                {
-                                    if (prop.Value.ValueKind == JsonValueKind.String)
-                                    {
-                                        connectionString = prop.Value.GetString();
-                                        break;
-                                    }
-                                }
-                            }
                         }
                         else if (root.TryGetProperty("SQL_SERVER_CONNECTION_STRING", out JsonElement top) && top.ValueKind == JsonValueKind.String)
                         {
                             connectionString = top.GetString();
                         }
                     }
-                    catch
-                    {
-                        // Ignore parsing errors and continue
-                    }
+                    catch { }
                 }
             }
 
-            if (connectionString == null)
-                throw new Exception("Configuración para conexión no encontrada. Se buscó en: .env (SQL_SERVER_CONNECTION_STRING), variables de entorno (ConnectionStrings__Default, ConnectionStrings:Default, DefaultConnection) y appsettings.json");
+            if (connectionString == null) throw new Exception("Configuración para conexión no encontrada.");
 
             return connectionString;
         }
@@ -333,6 +313,8 @@ namespace DAL
                 daTraduccion.SelectCommand.Connection = conn;
                 daPerfilUsuario.SelectCommand.Connection = conn;
                 daHistorialUsuario.SelectCommand.Connection = conn;
+                daDVV.SelectCommand.Connection = conn;
+                daUsuarioBackup.SelectCommand.Connection = conn;
 
                 daUsers.InsertCommand = cbUsers.GetInsertCommand();
                 daUsers.UpdateCommand = cbUsers.GetUpdateCommand();
@@ -375,13 +357,13 @@ namespace DAL
                 daTraduccion.InsertCommand.Connection = conn;
                 daTraduccion.UpdateCommand.Connection = conn;
                 daTraduccion.DeleteCommand.Connection = conn;
+
                 daPerfilUsuario.InsertCommand = cbPerfilUsuario.GetInsertCommand();
                 daPerfilUsuario.UpdateCommand = cbPerfilUsuario.GetUpdateCommand();
                 daPerfilUsuario.DeleteCommand = cbPerfilUsuario.GetDeleteCommand();
                 daPerfilUsuario.InsertCommand.Connection = conn;
                 daPerfilUsuario.UpdateCommand.Connection = conn;
                 daPerfilUsuario.DeleteCommand.Connection = conn;
-
 
                 daHistorialUsuario.InsertCommand = cbHistorialUsuario.GetInsertCommand();
                 daHistorialUsuario.UpdateCommand = cbHistorialUsuario.GetUpdateCommand();
@@ -390,6 +372,19 @@ namespace DAL
                 daHistorialUsuario.UpdateCommand.Connection = conn;
                 daHistorialUsuario.DeleteCommand.Connection = conn;
 
+                daDVV.InsertCommand = cbDVV.GetInsertCommand();
+                daDVV.UpdateCommand = cbDVV.GetUpdateCommand();
+                daDVV.DeleteCommand = cbDVV.GetDeleteCommand();
+                daDVV.InsertCommand.Connection = conn;
+                daDVV.UpdateCommand.Connection = conn;
+                daDVV.DeleteCommand.Connection = conn;
+
+                daUsuarioBackup.InsertCommand = cbUsuarioBackup.GetInsertCommand();
+                daUsuarioBackup.UpdateCommand = cbUsuarioBackup.GetUpdateCommand();
+                daUsuarioBackup.DeleteCommand = cbUsuarioBackup.GetDeleteCommand();
+                daUsuarioBackup.InsertCommand.Connection = conn;
+                daUsuarioBackup.UpdateCommand.Connection = conn;
+                daUsuarioBackup.DeleteCommand.Connection = conn;
 
                 daUsers.Update(mainDataSet, "Usuario");
                 daBitacora.Update(mainDataSet, "Bitacora");
@@ -399,10 +394,11 @@ namespace DAL
                 daTraduccion.Update(mainDataSet, "Traduccion");
                 daPerfilUsuario.Update(mainDataSet, "PerfilUsuario");
                 daHistorialUsuario.Update(mainDataSet, "HistorialUsuario");
+                daDVV.Update(mainDataSet, "DVV");
+                daUsuarioBackup.Update(mainDataSet, "UsuarioBackup");
 
                 mainDataSet.AcceptChanges();
             }
         }
-
     }
 }

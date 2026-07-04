@@ -1,6 +1,9 @@
 ﻿using BE;
 using DAL;
 using servicios;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BLL
 {
@@ -39,13 +42,35 @@ namespace BLL
                 string msg = GestorIdioma.GetInstance.TraducirMensaje("err_UsuarioIncorrecto", "Usuario incorrecto");
                 throw new Exception(msg);
             }
+
             Usuario _user = RepoUsuarios.ObtenerUsuario(usuario);
+
+            // --- RESTRICCIÓN: SISTEMA CORRUPTO ---
+            List<Usuario> corruptos = GestorIntegridad.VerificarIntegridadDVH();
+            bool dvvValido = GestorIntegridad.VerificarIntegridadDVV();
+
+            if (corruptos.Count > 0 || !dvvValido)
+            {
+                bool esAdmin = _user.Username.Equals("admin", StringComparison.OrdinalIgnoreCase) ||
+                               _user.Permisos.Any(p => p.ValidarPermiso("PERF-ADMIN"));
+
+                if (!esAdmin)
+                {
+                    string msgFallaIntegridad = GestorIdioma.GetInstance.TraducirMensaje("err_SoloAdminIntegridad",
+                        "Acceso denegado. El sistema se encuentra bloqueado por fallas de integridad. Solo el administrador puede acceder.");
+
+                    Notificar(_user.Username, "LOG_INTENTO_LOGIN_SISTEMA_CORRUPTO");
+                    throw new Exception(msgFallaIntegridad);
+                }
+            }
+
             if (_user.EstaBloqueado)
             {
                 string msg = GestorIdioma.GetInstance.TraducirMensaje("err_UsuarioBloqueado", "El usuario se encuentra bloqueado. Contacte a un administrador para recuperar el acceso.");
                 Notificar(_user.Username, "LOG_BLOQUEO");
                 throw new Exception(msg);
             }
+
             string hash = CryptoService.EncriptarPassword(pass);
 
             if (!CryptoService.Comparer(hash, _user.PasswordHash))
@@ -93,8 +118,7 @@ namespace BLL
 
         public bool VerificarExistenciaUsuario(string username)
         {
-            RepositorioUsuarios repoUsuarios = RepositorioUsuarios.GetInstance;
-            return repoUsuarios.VerificarExistenciaDeUsername(username);
+            return RepositorioUsuarios.GetInstance.VerificarExistenciaDeUsername(username);
         }
     }
 }

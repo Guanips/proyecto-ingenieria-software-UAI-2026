@@ -1,6 +1,10 @@
 using BE;
 using BLL;
 using servicios;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 using UI.Login;
 using UI.Modules;
 
@@ -71,6 +75,28 @@ namespace UI
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            try
+            {
+                // --- AVISO DE SISTEMA CORRUPTO ---
+                List<Usuario> corruptos = GestorIntegridad.VerificarIntegridadDVH();
+                bool dvvValido = GestorIntegridad.VerificarIntegridadDVV();
+
+                if (corruptos.Count > 0 || !dvvValido)
+                {
+                    string mensaje = GestorIdioma.GetInstance.TraducirMensaje("err_IntegridadCorrupta",
+                        "Alerta Crítica: Se ha detectado una violación en la integridad de la base de datos.\n\nEl sistema ha entrado en Modo de Recuperación. Solo los administradores pueden iniciar sesión.");
+                    string titulo = GestorIdioma.GetInstance.TraducirMensaje("msg_TituloError", "Error Crítico de Integridad");
+
+                    MessageBox.Show(mensaje, titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al verificar la integridad del sistema: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // --- CARGA DEL LOGIN Y ELEMENTOS NORMALES ---
             LoginUI loginUI = new LoginUI();
             cargarFormulario(loginUI);
 
@@ -94,7 +120,6 @@ namespace UI
                 comboIdiomasGlobal.SelectedValue = "ES";
             }
             comboIdiomasGlobal.SelectedIndexChanged += ComboIdiomasGlobal_SelectedIndexChanged;
-
         }
 
         private void mainUIStripMenuItemIniciarSesion_Click(object sender, EventArgs e)

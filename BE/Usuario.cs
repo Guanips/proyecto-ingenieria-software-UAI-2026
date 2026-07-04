@@ -10,7 +10,7 @@
         public string Idioma { get; set; }
         public int IntentosFallidos { get; private set; }
         public List<Permiso> Permisos { get; private set; }
-
+        public string DVH { get; set; } = string.Empty;
         public Usuario(Guid id, string nUsername, string nPasswordHash, string nEmail, string nNumTelefono, bool estaBloqueado, string idioma, int nIntentosFallidos)
         {
             Id = id;
