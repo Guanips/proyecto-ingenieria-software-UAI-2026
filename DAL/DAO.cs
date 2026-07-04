@@ -1,7 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Text.Json;
-using System.IO;
 
 namespace DAL
 {
@@ -11,8 +10,8 @@ namespace DAL
         private static readonly object _lock = new object();
 
         private DataSet mainDataSet;
-        private SqlDataAdapter daUsers, daBitacora, daPermiso, daPermisoRelacion, daIdioma, daTraduccion, daPerfilUsuario;
-        private SqlCommandBuilder cbUsers, cbBitacora, cbPermiso, cbPermisoRelacion, cbIdioma, cbTraduccion, cbPerfilUsuario;
+        private SqlDataAdapter daUsers, daBitacora, daPermiso, daPermisoRelacion, daIdioma, daTraduccion, daPerfilUsuario, daHistorialUsuario;
+        private SqlCommandBuilder cbUsers, cbBitacora, cbPermiso, cbPermisoRelacion, cbIdioma, cbTraduccion, cbPerfilUsuario, cbHistorialUsuario;
         private DAO()
         {
             string connectionString = ObtenerStringConexionEnv();
@@ -25,6 +24,7 @@ namespace DAL
             daIdioma = new SqlDataAdapter("Select * From Idioma", connectionString);
             daTraduccion = new SqlDataAdapter("Select * From Traduccion", connectionString);
             daPerfilUsuario = new SqlDataAdapter("Select * From PerfilUsuario", connectionString);
+            daHistorialUsuario = new SqlDataAdapter("Select * From HistorialUsuario", connectionString);
 
             daUsers.MissingSchemaAction = MissingSchemaAction.AddWithKey;
             daBitacora.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -33,6 +33,7 @@ namespace DAL
             daIdioma.MissingSchemaAction = MissingSchemaAction.AddWithKey;
             daTraduccion.MissingSchemaAction = MissingSchemaAction.AddWithKey;
             daPerfilUsuario.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+            daHistorialUsuario.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
             cbUsers = new SqlCommandBuilder(daUsers);
             cbBitacora = new SqlCommandBuilder(daBitacora);
@@ -57,6 +58,7 @@ namespace DAL
                 CargarTablaConEsquema(daIdioma, "Idioma", conn);
                 CargarTablaConEsquema(daTraduccion, "Traduccion", conn);
                 CargarTablaConEsquema(daPerfilUsuario, "PerfilUsuario", conn);
+                CargarTablaConEsquema(daHistorialUsuario, "HistorialUsuario", conn);
             }
 
             // 3. INSTANCIAR los CommandBuilders DESPUÉS de que las tablas tengan su esquema y PK cargados
@@ -65,6 +67,7 @@ namespace DAL
             cbPermiso = new SqlCommandBuilder(daPermiso);
             cbPermisoRelacion = new SqlCommandBuilder(daPermisoRelacion);
             cbPerfilUsuario = new SqlCommandBuilder(daPerfilUsuario);
+            cbHistorialUsuario = new SqlCommandBuilder(daHistorialUsuario);
 
             ConfigurarAutoincrementoGeneral();
             ArmarRelaciones();
@@ -165,38 +168,6 @@ namespace DAL
 
         private void ConfigurarAutoincrementoGeneral()
         {
-            //if (!mainDataSet.Tables.Contains("Bitacora") || !mainDataSet.Tables.Contains("Permiso")) return;
-
-            //DataTable dtBitacora = mainDataSet.Tables["Bitacora"]!;
-            //DataTable dtPermiso = mainDataSet.Tables["Permiso"]!;
-
-            //if (!dtBitacora.Columns.Contains("ID") || !dtPermiso.Columns.Contains("ID")) return;
-
-            //DataColumn columnaIdRegistroBitacora = dtBitacora.Columns["ID"]!;
-            //int maxId = 0;
-
-            //if (dtBitacora.Rows.Count > 0)
-            //{
-            //    maxId = dtBitacora.AsEnumerable()
-            //        .Max(r => r["ID"] == DBNull.Value ? 0 : Convert.ToInt32(r["ID"]));
-            //}
-
-            //columnaIdRegistroBitacora.AutoIncrement = true;
-            //columnaIdRegistroBitacora.AutoIncrementSeed = maxId + 1;
-            //columnaIdRegistroBitacora.AutoIncrementStep = 1;
-
-            //DataColumn columnaIdRegistroPermiso = dtPermiso.Columns["ID"]!;
-            //int maxIdPermiso = 0;
-
-            //if (dtPermiso.Rows.Count > 0)
-            //{
-            //    maxIdPermiso = dtPermiso.AsEnumerable()
-            //        .Max(r => r["ID"] == DBNull.Value ? 0 : Convert.ToInt32(r["ID"]));
-            //}
-
-            //columnaIdRegistroPermiso.AutoIncrement = true;
-            //columnaIdRegistroPermiso.AutoIncrementSeed = maxIdPermiso + 1;
-            //columnaIdRegistroPermiso.AutoIncrementStep = 1;
             if (mainDataSet.Tables.Contains("Bitacora") && mainDataSet.Tables["Bitacora"]!.Columns.Contains("ID"))
             {
                 DataTable dtBitacora = mainDataSet.Tables["Bitacora"]!;
@@ -217,7 +188,6 @@ namespace DAL
                 columnaIdRegistroPermiso.AutoIncrementStep = 1;
             }
 
-            // 4. Autoincremento para Traduccion (IdTraduccion)
             if (mainDataSet.Tables.Contains("Traduccion") && mainDataSet.Tables["Traduccion"]!.Columns.Contains("IdTraduccion"))
             {
                 DataTable dtTraduccion = mainDataSet.Tables["Traduccion"]!;
@@ -226,6 +196,16 @@ namespace DAL
                 colIdTrad.AutoIncrement = true;
                 colIdTrad.AutoIncrementSeed = maxIdTrad + 1;
                 colIdTrad.AutoIncrementStep = 1;
+            }
+
+            if (mainDataSet.Tables.Contains("HistorialUsuario") && mainDataSet.Tables["HistorialUsuario"]!.Columns.Contains("ID"))
+            {
+                DataTable dtHistorial = mainDataSet.Tables["HistorialUsuario"]!;
+                DataColumn colIdHistorial = dtHistorial.Columns["ID"]!;
+                int maxIdHistorial = dtHistorial.Rows.Count > 0 ? dtHistorial.AsEnumerable().Max(r => r["ID"] == DBNull.Value ? 0 : Convert.ToInt32(r["ID"])) : 0;
+                colIdHistorial.AutoIncrement = true;
+                colIdHistorial.AutoIncrementSeed = maxIdHistorial + 1;
+                colIdHistorial.AutoIncrementStep = 1;
             }
         }
 
@@ -326,7 +306,7 @@ namespace DAL
                 }
             }
 
-            if (connectionString == null) 
+            if (connectionString == null)
                 throw new Exception("Configuración para conexión no encontrada. Se buscó en: .env (SQL_SERVER_CONNECTION_STRING), variables de entorno (ConnectionStrings__Default, ConnectionStrings:Default, DefaultConnection) y appsettings.json");
 
             return connectionString;
@@ -352,6 +332,7 @@ namespace DAL
                 daIdioma.SelectCommand.Connection = conn;
                 daTraduccion.SelectCommand.Connection = conn;
                 daPerfilUsuario.SelectCommand.Connection = conn;
+                daHistorialUsuario.SelectCommand.Connection = conn;
 
                 daUsers.InsertCommand = cbUsers.GetInsertCommand();
                 daUsers.UpdateCommand = cbUsers.GetUpdateCommand();
@@ -401,6 +382,15 @@ namespace DAL
                 daPerfilUsuario.UpdateCommand.Connection = conn;
                 daPerfilUsuario.DeleteCommand.Connection = conn;
 
+
+                daHistorialUsuario.InsertCommand = cbHistorialUsuario.GetInsertCommand();
+                daHistorialUsuario.UpdateCommand = cbHistorialUsuario.GetUpdateCommand();
+                daHistorialUsuario.DeleteCommand = cbHistorialUsuario.GetDeleteCommand();
+                daHistorialUsuario.InsertCommand.Connection = conn;
+                daHistorialUsuario.UpdateCommand.Connection = conn;
+                daHistorialUsuario.DeleteCommand.Connection = conn;
+
+
                 daUsers.Update(mainDataSet, "Usuario");
                 daBitacora.Update(mainDataSet, "Bitacora");
                 daPermiso.Update(mainDataSet, "Permiso");
@@ -408,6 +398,7 @@ namespace DAL
                 daIdioma.Update(mainDataSet, "Idioma");
                 daTraduccion.Update(mainDataSet, "Traduccion");
                 daPerfilUsuario.Update(mainDataSet, "PerfilUsuario");
+                daHistorialUsuario.Update(mainDataSet, "HistorialUsuario");
 
                 mainDataSet.AcceptChanges();
             }

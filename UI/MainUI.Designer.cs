@@ -41,12 +41,13 @@
             mainUIStripMenuItemConsultarBitacora = new ToolStripMenuItem();
             comboIdiomasGlobal = new ComboBox();
             label1 = new Label();
+            mainUIStripMenuItemHistorialUsuario = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { mainUIStripMenuItemInicio, mainUIStripMenuItemGestionDeUsuarios, mainUIStripMenuItemGestionDePerfiles, mainUIStripMenuItemBitacora });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { mainUIStripMenuItemInicio, mainUIStripMenuItemGestionDeUsuarios, mainUIStripMenuItemGestionDePerfiles, mainUIStripMenuItemBitacora, mainUIStripMenuItemHistorialUsuario });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(1127, 24);
@@ -63,14 +64,14 @@
             // mainUIStripMenuItemIniciarSesion
             // 
             mainUIStripMenuItemIniciarSesion.Name = "mainUIStripMenuItemIniciarSesion";
-            mainUIStripMenuItemIniciarSesion.Size = new Size(180, 22);
+            mainUIStripMenuItemIniciarSesion.Size = new Size(142, 22);
             mainUIStripMenuItemIniciarSesion.Text = "Iniciar sesion";
             mainUIStripMenuItemIniciarSesion.Click += mainUIStripMenuItemIniciarSesion_Click;
             // 
             // mainUIStripMenuItemCerrarSesion
             // 
             mainUIStripMenuItemCerrarSesion.Name = "mainUIStripMenuItemCerrarSesion";
-            mainUIStripMenuItemCerrarSesion.Size = new Size(180, 22);
+            mainUIStripMenuItemCerrarSesion.Size = new Size(142, 22);
             mainUIStripMenuItemCerrarSesion.Text = "Cerrar sesion";
             mainUIStripMenuItemCerrarSesion.Click += mainUIStripMenuItemCerrarSesion_Click;
             // 
@@ -119,7 +120,7 @@
             // mainUIStripMenuItemConsultarBitacora
             // 
             mainUIStripMenuItemConsultarBitacora.Name = "mainUIStripMenuItemConsultarBitacora";
-            mainUIStripMenuItemConsultarBitacora.Size = new Size(180, 22);
+            mainUIStripMenuItemConsultarBitacora.Size = new Size(171, 22);
             mainUIStripMenuItemConsultarBitacora.Text = "Consultar bitacora";
             mainUIStripMenuItemConsultarBitacora.Click += mainUIStripMenuItemConsultarBitacora_Click;
             // 
@@ -140,6 +141,13 @@
             label1.Size = new Size(44, 15);
             label1.TabIndex = 2;
             label1.Text = "Idioma";
+            // 
+            // mainUIStripMenuItemHistorialUsuario
+            // 
+            mainUIStripMenuItemHistorialUsuario.Name = "mainUIStripMenuItemHistorialUsuario";
+            mainUIStripMenuItemHistorialUsuario.Size = new Size(105, 20);
+            mainUIStripMenuItemHistorialUsuario.Text = "Historial usuario";
+            mainUIStripMenuItemHistorialUsuario.Click += mainUIStripMenuItemHistorialUsuario_Click;
             // 
             // MainUI
             // 
@@ -174,5 +182,6 @@
         private ToolStripMenuItem mainUIStripMenuItemConsultarBitacora;
         private ComboBox comboIdiomasGlobal;
         private Label label1;
+        private ToolStripMenuItem mainUIStripMenuItemHistorialUsuario;
     }
 }

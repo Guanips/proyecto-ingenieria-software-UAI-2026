@@ -68,7 +68,7 @@
             gestionUsuariosUIGroupBoxAltaUsuario.Controls.Add(gestionUsuariosUIRegistroLabelEmail);
             gestionUsuariosUIGroupBoxAltaUsuario.Controls.Add(textBoxRegistroUsername);
             gestionUsuariosUIGroupBoxAltaUsuario.Controls.Add(gestionUsuariosUIRegistroLabelUsername);
-            gestionUsuariosUIGroupBoxAltaUsuario.Location = new Point(645, 162);
+            gestionUsuariosUIGroupBoxAltaUsuario.Location = new Point(787, 152);
             gestionUsuariosUIGroupBoxAltaUsuario.Name = "gestionUsuariosUIGroupBoxAltaUsuario";
             gestionUsuariosUIGroupBoxAltaUsuario.Size = new Size(292, 214);
             gestionUsuariosUIGroupBoxAltaUsuario.TabIndex = 0;
@@ -171,7 +171,7 @@
             gestionUsuariosUIGroupBoxListadoUsuarios.Controls.Add(dataGridViewListadoUsuarios);
             gestionUsuariosUIGroupBoxListadoUsuarios.Location = new Point(12, 12);
             gestionUsuariosUIGroupBoxListadoUsuarios.Name = "gestionUsuariosUIGroupBoxListadoUsuarios";
-            gestionUsuariosUIGroupBoxListadoUsuarios.Size = new Size(610, 457);
+            gestionUsuariosUIGroupBoxListadoUsuarios.Size = new Size(769, 457);
             gestionUsuariosUIGroupBoxListadoUsuarios.TabIndex = 1;
             gestionUsuariosUIGroupBoxListadoUsuarios.TabStop = false;
             gestionUsuariosUIGroupBoxListadoUsuarios.Text = "Listado de usuarios";
@@ -194,7 +194,7 @@
             dataGridViewListadoUsuarios.Name = "dataGridViewListadoUsuarios";
             dataGridViewListadoUsuarios.ReadOnly = true;
             dataGridViewListadoUsuarios.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridViewListadoUsuarios.Size = new Size(598, 397);
+            dataGridViewListadoUsuarios.Size = new Size(757, 397);
             dataGridViewListadoUsuarios.TabIndex = 0;
             dataGridViewListadoUsuarios.SelectionChanged += dataGridViewListadoUsuarios_SelectionChanged;
             // 
@@ -205,7 +205,7 @@
             gestionUsuariosUIGroupBoxModificacionUsuarios.Controls.Add(gestionUsuariosUIModificacionLabelNumTelefono);
             gestionUsuariosUIGroupBoxModificacionUsuarios.Controls.Add(textBoxModificacionEmail);
             gestionUsuariosUIGroupBoxModificacionUsuarios.Controls.Add(gestionUsuariosUIModificacionLabelEmail);
-            gestionUsuariosUIGroupBoxModificacionUsuarios.Location = new Point(645, 12);
+            gestionUsuariosUIGroupBoxModificacionUsuarios.Location = new Point(787, 12);
             gestionUsuariosUIGroupBoxModificacionUsuarios.Name = "gestionUsuariosUIGroupBoxModificacionUsuarios";
             gestionUsuariosUIGroupBoxModificacionUsuarios.Size = new Size(292, 125);
             gestionUsuariosUIGroupBoxModificacionUsuarios.TabIndex = 2;
@@ -258,7 +258,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(967, 481);
+            ClientSize = new Size(1095, 481);
             ControlBox = false;
             Controls.Add(gestionUsuariosUIGroupBoxModificacionUsuarios);
             Controls.Add(gestionUsuariosUIGroupBoxListadoUsuarios);

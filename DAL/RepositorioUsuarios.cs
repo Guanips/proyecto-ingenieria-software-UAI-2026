@@ -138,6 +138,21 @@ namespace DAL
             DataRow filaUsuario = foundRows[0];
             filaUsuario["Email"] = usuarioModificado.Email;
             filaUsuario["NumTelefono"] = usuarioModificado.NumTelefono;
+
+            DAO.GetInstance.SubirCambiosBD();
+        }
+
+        public void AgregarHistorialUsuario(Usuario usuarioModificado)
+        {
+            DataSet ds = DAO.GetInstance.ObtenerDataSet();
+            DataTable dtHistorialUsuario = ds.Tables["HistorialUsuario"];
+            if (dtHistorialUsuario == null) throw new Exception("No se encontró la tabla de historial de usuarios en el DataSet");
+            DataRow newRow = dtHistorialUsuario.NewRow();
+            newRow["ID_Usuario"] = usuarioModificado.Id;
+            newRow["Email"] = usuarioModificado.Email;
+            newRow["NumTelefono"] = usuarioModificado.NumTelefono;
+            newRow["Fecha"] = DateTime.Now;
+            dtHistorialUsuario.Rows.Add(newRow);
             DAO.GetInstance.SubirCambiosBD();
         }
 
