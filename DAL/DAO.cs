@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Data;
 using System.IO;
@@ -14,8 +14,8 @@ namespace DAL
 
         private DataSet mainDataSet;
 
-        private SqlDataAdapter daUsers, daBitacora, daPermiso, daPermisoRelacion, daIdioma, daTraduccion, daPerfilUsuario, daHistorialUsuario, daDVV, daUsuarioBackup;
-        private SqlCommandBuilder cbUsers, cbBitacora, cbPermiso, cbPermisoRelacion, cbIdioma, cbTraduccion, cbPerfilUsuario, cbHistorialUsuario, cbDVV, cbUsuarioBackup;
+        private SqlDataAdapter daUsers, daBitacora, daPermiso, daPermisoRelacion, daIdioma, daTraduccion, daPerfilUsuario, daHistorialUsuario, daDVV;
+        private SqlCommandBuilder cbUsers, cbBitacora, cbPermiso, cbPermisoRelacion, cbIdioma, cbTraduccion, cbPerfilUsuario, cbHistorialUsuario, cbDVV;
 
         private DAO()
         {
@@ -30,7 +30,6 @@ namespace DAL
             daPerfilUsuario = new SqlDataAdapter("Select * From PerfilUsuario", connectionString);
             daHistorialUsuario = new SqlDataAdapter("Select * From HistorialUsuario", connectionString);
             daDVV = new SqlDataAdapter("Select * From DVV", connectionString);
-            daUsuarioBackup = new SqlDataAdapter("Select * From UsuarioBackup", connectionString);
 
             daUsers.MissingSchemaAction = MissingSchemaAction.AddWithKey;
             daBitacora.MissingSchemaAction = MissingSchemaAction.AddWithKey;
@@ -41,7 +40,6 @@ namespace DAL
             daPerfilUsuario.MissingSchemaAction = MissingSchemaAction.AddWithKey;
             daHistorialUsuario.MissingSchemaAction = MissingSchemaAction.AddWithKey;
             daDVV.MissingSchemaAction = MissingSchemaAction.AddWithKey;
-            daUsuarioBackup.MissingSchemaAction = MissingSchemaAction.AddWithKey;
 
             cbUsers = new SqlCommandBuilder(daUsers);
             cbBitacora = new SqlCommandBuilder(daBitacora);
@@ -67,7 +65,6 @@ namespace DAL
                 CargarTablaConEsquema(daPerfilUsuario, "PerfilUsuario", conn);
                 CargarTablaConEsquema(daHistorialUsuario, "HistorialUsuario", conn);
                 CargarTablaConEsquema(daDVV, "DVV", conn);
-                CargarTablaConEsquema(daUsuarioBackup, "UsuarioBackup", conn);
             }
 
             cbUsers = new SqlCommandBuilder(daUsers);
@@ -77,7 +74,6 @@ namespace DAL
             cbPerfilUsuario = new SqlCommandBuilder(daPerfilUsuario);
             cbHistorialUsuario = new SqlCommandBuilder(daHistorialUsuario);
             cbDVV = new SqlCommandBuilder(daDVV);
-            cbUsuarioBackup = new SqlCommandBuilder(daUsuarioBackup);
 
             ConfigurarAutoincrementoGeneral();
             ArmarRelaciones();
@@ -314,7 +310,6 @@ namespace DAL
                 daPerfilUsuario.SelectCommand.Connection = conn;
                 daHistorialUsuario.SelectCommand.Connection = conn;
                 daDVV.SelectCommand.Connection = conn;
-                daUsuarioBackup.SelectCommand.Connection = conn;
 
                 daUsers.InsertCommand = cbUsers.GetInsertCommand();
                 daUsers.UpdateCommand = cbUsers.GetUpdateCommand();
@@ -379,13 +374,6 @@ namespace DAL
                 daDVV.UpdateCommand.Connection = conn;
                 daDVV.DeleteCommand.Connection = conn;
 
-                daUsuarioBackup.InsertCommand = cbUsuarioBackup.GetInsertCommand();
-                daUsuarioBackup.UpdateCommand = cbUsuarioBackup.GetUpdateCommand();
-                daUsuarioBackup.DeleteCommand = cbUsuarioBackup.GetDeleteCommand();
-                daUsuarioBackup.InsertCommand.Connection = conn;
-                daUsuarioBackup.UpdateCommand.Connection = conn;
-                daUsuarioBackup.DeleteCommand.Connection = conn;
-
                 daUsers.Update(mainDataSet, "Usuario");
                 daBitacora.Update(mainDataSet, "Bitacora");
                 daPermiso.Update(mainDataSet, "Permiso");
@@ -395,7 +383,6 @@ namespace DAL
                 daPerfilUsuario.Update(mainDataSet, "PerfilUsuario");
                 daHistorialUsuario.Update(mainDataSet, "HistorialUsuario");
                 daDVV.Update(mainDataSet, "DVV");
-                daUsuarioBackup.Update(mainDataSet, "UsuarioBackup");
 
                 mainDataSet.AcceptChanges();
             }
