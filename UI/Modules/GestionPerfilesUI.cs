@@ -85,7 +85,7 @@ namespace UI.Modules
 
         private void OcultarColumnasDataGridView()
         {
-            string[] columnasOcultas = { "PasswordHash", "Permisos", "NumTelefono", "Email", "EstaBloqueado" };
+            string[] columnasOcultas = { "PasswordHash", "Permisos", "NumTelefono", "Email", "EstaBloqueado", "IntentosFallidos" };
             foreach (string nombreColumna in columnasOcultas)
             {
                 if (dataGridViewUsuarios.Columns[nombreColumna] != null)

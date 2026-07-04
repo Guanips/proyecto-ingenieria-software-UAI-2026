@@ -62,6 +62,7 @@ namespace BLL
             Usuario usuarioObtenido = RepositorioUsuarios.GetInstance.ObtenerUsuario(nUsername);
             Usuario usuarioModificado = new Usuario(usuarioObtenido.Id, nUsername, usuarioObtenido.PasswordHash, nEmail, nNumTelefono, usuarioObtenido.EstaBloqueado, usuarioObtenido.Idioma, usuarioObtenido.IntentosFallidos);
             RepositorioUsuarios.GetInstance.ModificarUsuario(usuarioModificado);
+            RepositorioUsuarios.GetInstance.AgregarHistorialUsuario(usuarioModificado);
             Notificar(SessionManager.getInstance.ObtenerUsuarioActivo()!.Username, "LOG_USER_MOD");
         }
     }
