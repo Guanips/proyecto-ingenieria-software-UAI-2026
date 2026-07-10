@@ -29,7 +29,6 @@ namespace servicios
                 }
             }
 
-            // Evaluar separadamente Controls, Items y DropDownItems
             string[] nombresColecciones = { "Controls", "Items", "DropDownItems" };
 
             foreach (string nombreCol in nombresColecciones)

@@ -59,6 +59,7 @@ namespace UI
                     mainUIStripMenuItemGestionDePerfiles.Enabled = usuarioActual.Permisos.Any(p => p.ValidarPermiso("PERM-GESTIONAR-PERFIL"));
                     mainUIStripMenuItemBitacora.Enabled = usuarioActual.Permisos.Any(p => p.ValidarPermiso("PERM-CONSULTA-BIT"));
                     mainUIStripMenuItemHistorialUsuario.Enabled = usuarioActual.Permisos.Any(p => p.ValidarPermiso("PERM-GESTIONAR-HISTORIAL"));
+                    agregarIdiomaToolStripMenuItem.Enabled = usuarioActual.Permisos.Any(p => p.ValidarPermiso("PERM-AGREGAR-IDM"));
                 }
                 else
                 {
@@ -206,6 +207,12 @@ namespace UI
         {
             GestionHistorialUsuarioUI gestionHistorialUsuarioUI = new GestionHistorialUsuarioUI();
             cargarFormulario(gestionHistorialUsuarioUI);
+        }
+
+        private void agregarIdiomaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GestionIdiomasUI gestorIdiomasUI = new GestionIdiomasUI();
+            cargarFormulario(gestorIdiomasUI);
         }
     }
 }

@@ -12,10 +12,6 @@ namespace DAL
     {
         public RepositorioIdioma() { }
 
-        /// <summary>
-        /// Busca en el DataSet en memoria las traducciones correspondientes a un idioma
-        /// y las devuelve empaquetadas en un diccionario asociativo.
-        /// </summary>
         public Dictionary<string, string> ObtenerTraducciones(string codigoIdioma)
         {
             var diccionarioResult = new Dictionary<string, string>();
@@ -54,7 +50,6 @@ namespace DAL
         {
             List<Idioma> lista = new List<Idioma>();
 
-            // Accedemos al DataSet centralizado a través de tu DAO
             DataSet ds = DAO.GetInstance.ObtenerDataSet();
             DataTable dtIdiomas = ds.Tables["Idioma"];
 
@@ -72,5 +67,35 @@ namespace DAL
             return lista;
         }
 
+        public void GuardarNuevoIdiomaConTraducciones(Idioma nuevoIdioma, Dictionary<string, string> traducciones)
+        {
+            DAO dao = DAO.GetInstance;
+            DataSet ds = dao.ObtenerDataSet();
+
+            DataTable? dtIdioma = ds.Tables["Idioma"];
+            DataTable? dtTraduccion = ds.Tables["Traduccion"];
+
+            if (dtIdioma == null || dtTraduccion == null)
+                throw new Exception("Error: No se encontraron las tablas de Idioma o Traducción en el DataSet.");
+
+            
+            DataRow rowIdioma = dtIdioma.NewRow();
+            rowIdioma["Codigo"] = nuevoIdioma.Codigo;
+            rowIdioma["Nombre"] = nuevoIdioma.Nombre;
+            dtIdioma.Rows.Add(rowIdioma);
+
+            
+            foreach (KeyValuePair<string, string> kvp in traducciones)
+            {
+                DataRow rowTraduccion = dtTraduccion.NewRow();
+                rowTraduccion["CodigoIdioma"] = nuevoIdioma.Codigo;
+                rowTraduccion["KeyEtiqueta"] = kvp.Key;
+                rowTraduccion["Texto"] = string.IsNullOrWhiteSpace(kvp.Value) ? kvp.Key : kvp.Value;
+                dtTraduccion.Rows.Add(rowTraduccion);
+            }
+
+            
+            dao.SubirCambiosBD();
+        }
     }
 }

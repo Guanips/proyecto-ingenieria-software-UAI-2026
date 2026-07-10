@@ -121,7 +121,7 @@ namespace DAL
 
             // Sincronización automática de DVV y Backup
             RepositorioIntegridad.GetInstance.ActualizarDVVGlobal();
-            RepositorioIntegridad.GetInstance.GuardarBackup(nUsuario);
+            
         }
 
         public void ModificarUsuario(Usuario usuarioModificado)
@@ -141,7 +141,7 @@ namespace DAL
             DAO.GetInstance.SubirCambiosBD();
 
             RepositorioIntegridad.GetInstance.ActualizarDVVGlobal();
-            RepositorioIntegridad.GetInstance.GuardarBackup(usuarioModificado);
+            
         }
 
         public void AgregarHistorialUsuario(Usuario usuarioModificado)
@@ -173,7 +173,6 @@ namespace DAL
 
             // --- Sincronización de Bajas ---
             RepositorioIntegridad.GetInstance.ActualizarDVVGlobal();
-            RepositorioIntegridad.GetInstance.EliminarDeBackup(u.Id);
         }
 
         public void CambiarEstadoBloqueo(string username, bool estaBloqueado)
