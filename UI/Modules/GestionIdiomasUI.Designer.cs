@@ -32,7 +32,7 @@
             // 
             // textBoxCodigo
             // 
-            textBoxCodigo.Location = new Point(130, 25);
+            textBoxCodigo.Location = new Point(165, 71);
             textBoxCodigo.MaxLength = 5;
             textBoxCodigo.Name = "textBoxCodigo";
             textBoxCodigo.Size = new Size(80, 23);
@@ -40,14 +40,14 @@
             // 
             // textBoxNombre
             // 
-            textBoxNombre.Location = new Point(340, 25);
+            textBoxNombre.Location = new Point(375, 71);
             textBoxNombre.Name = "textBoxNombre";
             textBoxNombre.Size = new Size(180, 23);
             textBoxNombre.TabIndex = 4;
             // 
             // labelCodigo
             // 
-            labelCodigo.Location = new Point(20, 28);
+            labelCodigo.Location = new Point(55, 74);
             labelCodigo.Name = "labelCodigo";
             labelCodigo.Size = new Size(100, 23);
             labelCodigo.TabIndex = 3;
@@ -55,7 +55,7 @@
             // 
             // labelNombre
             // 
-            labelNombre.Location = new Point(240, 28);
+            labelNombre.Location = new Point(275, 74);
             labelNombre.Name = "labelNombre";
             labelNombre.Size = new Size(100, 23);
             labelNombre.TabIndex = 2;
@@ -66,15 +66,14 @@
             dataGridViewTraducciones.AllowUserToAddRows = false;
             dataGridViewTraducciones.AllowUserToDeleteRows = false;
             dataGridViewTraducciones.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewTraducciones.Location = new Point(20, 70);
+            dataGridViewTraducciones.Location = new Point(55, 116);
             dataGridViewTraducciones.Name = "dataGridViewTraducciones";
-            dataGridViewTraducciones.ReadOnly = true;
             dataGridViewTraducciones.Size = new Size(880, 400);
             dataGridViewTraducciones.TabIndex = 1;
             // 
             // btnGuardarIdioma
             // 
-            btnGuardarIdioma.Location = new Point(568, 18);
+            btnGuardarIdioma.Location = new Point(603, 64);
             btnGuardarIdioma.Name = "btnGuardarIdioma";
             btnGuardarIdioma.Size = new Size(118, 35);
             btnGuardarIdioma.TabIndex = 0;
@@ -87,14 +86,17 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(966, 540);
+            ControlBox = false;
             Controls.Add(btnGuardarIdioma);
             Controls.Add(dataGridViewTraducciones);
             Controls.Add(labelNombre);
             Controls.Add(labelCodigo);
             Controls.Add(textBoxNombre);
             Controls.Add(textBoxCodigo);
+            FormBorderStyle = FormBorderStyle.None;
             Name = "GestionIdiomasUI";
             Text = "Configuración de Nuevos Idiomas";
+            WindowState = FormWindowState.Maximized;
             Load += GestionIdiomasUI_Load;
             ((System.ComponentModel.ISupportInitialize)dataGridViewTraducciones).EndInit();
             ResumeLayout(false);

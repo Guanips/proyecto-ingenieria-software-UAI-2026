@@ -38,7 +38,7 @@
             dataGridViewBloqueados.AllowUserToAddRows = false;
             dataGridViewBloqueados.AllowUserToDeleteRows = false;
             dataGridViewBloqueados.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewBloqueados.Location = new Point(54, 28);
+            dataGridViewBloqueados.Location = new Point(129, 83);
             dataGridViewBloqueados.Name = "dataGridViewBloqueados";
             dataGridViewBloqueados.ReadOnly = true;
             dataGridViewBloqueados.Size = new Size(401, 265);
@@ -46,7 +46,7 @@
             // 
             // btnDesbloquear
             // 
-            btnDesbloquear.Location = new Point(538, 55);
+            btnDesbloquear.Location = new Point(613, 110);
             btnDesbloquear.Name = "btnDesbloquear";
             btnDesbloquear.Size = new Size(75, 23);
             btnDesbloquear.TabIndex = 1;

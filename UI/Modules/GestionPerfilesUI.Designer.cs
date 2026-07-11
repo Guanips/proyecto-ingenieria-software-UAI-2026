@@ -57,7 +57,7 @@
             perfilesUIGroupBoxTreeView.Controls.Add(textBoxNombrePerfil);
             perfilesUIGroupBoxTreeView.Controls.Add(perfilesUILabelNombrePerfil);
             perfilesUIGroupBoxTreeView.Controls.Add(treeViewCompositePermisos);
-            perfilesUIGroupBoxTreeView.Location = new Point(13, 29);
+            perfilesUIGroupBoxTreeView.Location = new Point(70, 70);
             perfilesUIGroupBoxTreeView.Name = "perfilesUIGroupBoxTreeView";
             perfilesUIGroupBoxTreeView.Size = new Size(297, 436);
             perfilesUIGroupBoxTreeView.TabIndex = 0;
@@ -101,7 +101,7 @@
             // 
             perfilesUIGroupBoxListBoxPerfiles.Controls.Add(perfilUIButtonAsignarPerfil);
             perfilesUIGroupBoxListBoxPerfiles.Controls.Add(listBoxPerfiles);
-            perfilesUIGroupBoxListBoxPerfiles.Location = new Point(316, 29);
+            perfilesUIGroupBoxListBoxPerfiles.Location = new Point(373, 70);
             perfilesUIGroupBoxListBoxPerfiles.Name = "perfilesUIGroupBoxListBoxPerfiles";
             perfilesUIGroupBoxListBoxPerfiles.Size = new Size(209, 228);
             perfilesUIGroupBoxListBoxPerfiles.TabIndex = 1;
@@ -133,7 +133,7 @@
             perfilesUIGroupBoxUsuarios.Controls.Add(perfilUIButtonAsignarPerfilUsuario);
             perfilesUIGroupBoxUsuarios.Controls.Add(treeViewPermisosUsuario);
             perfilesUIGroupBoxUsuarios.Controls.Add(dataGridViewUsuarios);
-            perfilesUIGroupBoxUsuarios.Location = new Point(531, 29);
+            perfilesUIGroupBoxUsuarios.Location = new Point(588, 70);
             perfilesUIGroupBoxUsuarios.Name = "perfilesUIGroupBoxUsuarios";
             perfilesUIGroupBoxUsuarios.Size = new Size(535, 436);
             perfilesUIGroupBoxUsuarios.TabIndex = 2;
@@ -185,7 +185,7 @@
             // 
             perfilesUIGroupBoxListBoxPermisos.Controls.Add(perfilUIButtonAsignarPermiso);
             perfilesUIGroupBoxListBoxPermisos.Controls.Add(listBoxPermisos);
-            perfilesUIGroupBoxListBoxPermisos.Location = new Point(316, 263);
+            perfilesUIGroupBoxListBoxPermisos.Location = new Point(373, 304);
             perfilesUIGroupBoxListBoxPermisos.Name = "perfilesUIGroupBoxListBoxPermisos";
             perfilesUIGroupBoxListBoxPermisos.Size = new Size(209, 202);
             perfilesUIGroupBoxListBoxPermisos.TabIndex = 2;
@@ -215,7 +215,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1079, 494);
+            ClientSize = new Size(1156, 530);
             ControlBox = false;
             Controls.Add(perfilesUIGroupBoxListBoxPermisos);
             Controls.Add(perfilesUIGroupBoxUsuarios);

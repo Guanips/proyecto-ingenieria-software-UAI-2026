@@ -42,7 +42,7 @@
             dataGridViewUsuarios.AllowUserToAddRows = false;
             dataGridViewUsuarios.AllowUserToDeleteRows = false;
             dataGridViewUsuarios.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewUsuarios.Location = new Point(12, 46);
+            dataGridViewUsuarios.Location = new Point(73, 90);
             dataGridViewUsuarios.MultiSelect = false;
             dataGridViewUsuarios.Name = "dataGridViewUsuarios";
             dataGridViewUsuarios.ReadOnly = true;
@@ -56,7 +56,7 @@
             dataGridViewHistorial.AllowUserToAddRows = false;
             dataGridViewHistorial.AllowUserToDeleteRows = false;
             dataGridViewHistorial.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewHistorial.Location = new Point(566, 46);
+            dataGridViewHistorial.Location = new Point(627, 90);
             dataGridViewHistorial.MultiSelect = false;
             dataGridViewHistorial.Name = "dataGridViewHistorial";
             dataGridViewHistorial.ReadOnly = true;
@@ -66,7 +66,7 @@
             // 
             // gestionHistorialUIButtonRecuperarEstado
             // 
-            gestionHistorialUIButtonRecuperarEstado.Location = new Point(764, 47);
+            gestionHistorialUIButtonRecuperarEstado.Location = new Point(825, 91);
             gestionHistorialUIButtonRecuperarEstado.Name = "gestionHistorialUIButtonRecuperarEstado";
             gestionHistorialUIButtonRecuperarEstado.Size = new Size(149, 388);
             gestionHistorialUIButtonRecuperarEstado.TabIndex = 2;
@@ -77,7 +77,7 @@
             // gestionHistorialUILabelGridUsuarios
             // 
             gestionHistorialUILabelGridUsuarios.AutoSize = true;
-            gestionHistorialUILabelGridUsuarios.Location = new Point(12, 28);
+            gestionHistorialUILabelGridUsuarios.Location = new Point(73, 72);
             gestionHistorialUILabelGridUsuarios.Name = "gestionHistorialUILabelGridUsuarios";
             gestionHistorialUILabelGridUsuarios.Size = new Size(115, 15);
             gestionHistorialUILabelGridUsuarios.TabIndex = 3;
@@ -86,7 +86,7 @@
             // gestionHistorialUILabelGridEstadoUsuarios
             // 
             gestionHistorialUILabelGridEstadoUsuarios.AutoSize = true;
-            gestionHistorialUILabelGridEstadoUsuarios.Location = new Point(566, 28);
+            gestionHistorialUILabelGridEstadoUsuarios.Location = new Point(627, 72);
             gestionHistorialUILabelGridEstadoUsuarios.Name = "gestionHistorialUILabelGridEstadoUsuarios";
             gestionHistorialUILabelGridEstadoUsuarios.Size = new Size(184, 15);
             gestionHistorialUILabelGridEstadoUsuarios.TabIndex = 4;
@@ -96,7 +96,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(925, 450);
+            ClientSize = new Size(1003, 506);
             ControlBox = false;
             Controls.Add(gestionHistorialUILabelGridEstadoUsuarios);
             Controls.Add(gestionHistorialUILabelGridUsuarios);
