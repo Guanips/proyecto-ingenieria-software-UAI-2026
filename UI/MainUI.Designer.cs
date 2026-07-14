@@ -40,15 +40,16 @@
             mainUIStripMenuItemBitacora = new ToolStripMenuItem();
             mainUIStripMenuItemConsultarBitacora = new ToolStripMenuItem();
             mainUIStripMenuItemHistorialUsuario = new ToolStripMenuItem();
+            agregarIdiomaToolStripMenuItem = new ToolStripMenuItem();
             comboIdiomasGlobal = new ComboBox();
             label1 = new Label();
-            agregarIdiomaToolStripMenuItem = new ToolStripMenuItem();
+            recuperarIntegridadToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { mainUIStripMenuItemInicio, mainUIStripMenuItemGestionDeUsuarios, mainUIStripMenuItemGestionDePerfiles, mainUIStripMenuItemBitacora, mainUIStripMenuItemHistorialUsuario, agregarIdiomaToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { mainUIStripMenuItemInicio, mainUIStripMenuItemGestionDeUsuarios, mainUIStripMenuItemGestionDePerfiles, mainUIStripMenuItemBitacora, mainUIStripMenuItemHistorialUsuario, agregarIdiomaToolStripMenuItem, recuperarIntegridadToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(1127, 24);
@@ -132,6 +133,13 @@
             mainUIStripMenuItemHistorialUsuario.Text = "Historial usuario";
             mainUIStripMenuItemHistorialUsuario.Click += mainUIStripMenuItemHistorialUsuario_Click;
             // 
+            // agregarIdiomaToolStripMenuItem
+            // 
+            agregarIdiomaToolStripMenuItem.Name = "agregarIdiomaToolStripMenuItem";
+            agregarIdiomaToolStripMenuItem.Size = new Size(101, 20);
+            agregarIdiomaToolStripMenuItem.Text = "Agregar Idioma";
+            agregarIdiomaToolStripMenuItem.Click += agregarIdiomaToolStripMenuItem_Click;
+            // 
             // comboIdiomasGlobal
             // 
             comboIdiomasGlobal.FormattingEnabled = true;
@@ -150,12 +158,12 @@
             label1.TabIndex = 2;
             label1.Text = "Idioma";
             // 
-            // agregarIdiomaToolStripMenuItem
+            // recuperarIntegridadToolStripMenuItem
             // 
-            agregarIdiomaToolStripMenuItem.Name = "agregarIdiomaToolStripMenuItem";
-            agregarIdiomaToolStripMenuItem.Size = new Size(101, 20);
-            agregarIdiomaToolStripMenuItem.Text = "Agregar Idioma";
-            agregarIdiomaToolStripMenuItem.Click += agregarIdiomaToolStripMenuItem_Click;
+            recuperarIntegridadToolStripMenuItem.Name = "recuperarIntegridadToolStripMenuItem";
+            recuperarIntegridadToolStripMenuItem.Size = new Size(129, 20);
+            recuperarIntegridadToolStripMenuItem.Text = "Recuperar integridad";
+            recuperarIntegridadToolStripMenuItem.Click += recuperarIntegridadToolStripMenuItem_Click;
             // 
             // MainUI
             // 
@@ -192,5 +200,6 @@
         private Label label1;
         private ToolStripMenuItem mainUIStripMenuItemHistorialUsuario;
         private ToolStripMenuItem agregarIdiomaToolStripMenuItem;
+        private ToolStripMenuItem recuperarIntegridadToolStripMenuItem;
     }
 }

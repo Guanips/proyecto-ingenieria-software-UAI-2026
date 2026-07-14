@@ -34,5 +34,19 @@ namespace BLL
 
             return dvvCalculado == dvvAlmacenado;
         }
+        public static void RecuperarIntegridadDVH()
+        {
+            //List<Usuario> usuariosCorruptos = new List<Usuario>();
+            List<Usuario> usuarios = RepositorioUsuarios.GetInstance.ObtenerListadoTotalUsuarios();
+
+            foreach (var u in usuarios)
+            {
+                if (u.DVH != IntegridadService.CalcularDVH(u))
+                {
+                    //usuariosCorruptos.Add(u);
+                    RepositorioUsuarios.GetInstance.ModificarUsuario(u);
+                }
+            }
+        }
     }
 }

@@ -63,7 +63,6 @@
             // 
             // dataGridViewTraducciones
             // 
-            dataGridViewTraducciones.AllowUserToAddRows = false;
             dataGridViewTraducciones.AllowUserToDeleteRows = false;
             dataGridViewTraducciones.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewTraducciones.Location = new Point(55, 116);

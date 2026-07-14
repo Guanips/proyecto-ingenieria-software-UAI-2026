@@ -56,6 +56,7 @@ namespace UI
                 if (usuarioActual != null)
                 {
                     mainUIStripMenuItemGestionDeUsuarios.Enabled = usuarioActual.Permisos.Any(p => p.ValidarPermiso("PERM-GESTIONAR-USR"));
+                    recuperarIntegridadToolStripMenuItem.Enabled = usuarioActual.Permisos.Any(p => p.ValidarPermiso("PERM-GESTIONAR-USR"));
                     mainUIStripMenuItemGestionDePerfiles.Enabled = usuarioActual.Permisos.Any(p => p.ValidarPermiso("PERM-GESTIONAR-PERFIL"));
                     mainUIStripMenuItemBitacora.Enabled = usuarioActual.Permisos.Any(p => p.ValidarPermiso("PERM-CONSULTA-BIT"));
                     mainUIStripMenuItemHistorialUsuario.Enabled = usuarioActual.Permisos.Any(p => p.ValidarPermiso("PERM-GESTIONAR-HISTORIAL"));
@@ -213,6 +214,12 @@ namespace UI
         {
             GestionIdiomasUI gestorIdiomasUI = new GestionIdiomasUI();
             cargarFormulario(gestorIdiomasUI);
+        }
+
+        private void recuperarIntegridadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GestorIntegridad.RecuperarIntegridadDVH();
+            MessageBox.Show("Integridad de la base de datos recuperada correctamente.", "Recuperación de Integridad", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }
